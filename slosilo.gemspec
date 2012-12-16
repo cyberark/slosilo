@@ -14,4 +14,6 @@ Gem::Specification.new do |gem|
   gem.name          = "slosilo"
   gem.require_paths = ["lib"]
   gem.version       = Slosilo::VERSION
+  
+  gem.add_runtime_dependency 'sequel'
 end

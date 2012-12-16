@@ -1,6 +1,7 @@
 # Slosilo
 
-TODO: Write a gem description
+Slosilo is a keystore in the database. (Currently only works with postgres.)
+It allows easy storage and retrieval of keys.
 
 ## Installation
 
@@ -12,13 +13,25 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
+Add a migration to create the necessary table:
 
-    $ gem install slosilo
+    require 'slosilo/keystore_table'
+    Sequel.migration do
+      up do
+        slosilo_keystore
+        create_keystore_table
+      end
+      down do
+        slosilo_keystore
+        drop_keystore_table
+      end
+    end
+
+Remember to migrate your database
+
+    $ rake db:migrate
 
 ## Usage
-
-TODO: Write usage instructions here
 
 ## Contributing
 
