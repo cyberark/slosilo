@@ -17,4 +17,7 @@ Gem::Specification.new do |gem|
   
   gem.add_runtime_dependency 'sequel'
   gem.add_runtime_dependency 'attr_encrypted'
+  
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'simplecov'
 end
