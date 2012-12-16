@@ -18,7 +18,7 @@ module Slosilo
       create_table keystore_table do
         String :id, primary_key: true
         # Note: currently only postgres is supported
-        bytea :key, null: false
+        bytea :encrypted_key, null: false
       end
     end
     
