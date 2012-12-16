@@ -1,5 +1,5 @@
 require "slosilo/version"
+require "slosilo/keystore"
+require "slosilo/keypair"
 
-module Slosilo
-  # Your code goes here...
-end
+Dir[File.join(File.dirname(__FILE__), 'tasks/*.rake')].each { |ext| load ext } if defined?(Rake)
