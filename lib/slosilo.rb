@@ -1,6 +1,7 @@
 require "slosilo/version"
 require "slosilo/keystore"
 require "slosilo/keypair"
+require "slosilo/symmetric"
 
 if defined? Sequel
   require 'slosilo/adapters/sequel_adapter'
