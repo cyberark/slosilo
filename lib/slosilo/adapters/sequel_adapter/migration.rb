@@ -1,7 +1,7 @@
 require 'sequel'
 
 module Slosilo
-  module KeystoreTable
+  module Adapters::SequelAdapter::Migration
     # The default name of the table to hold the keys
     DEFAULT_KEYSTORE_TABLE = :slosilo_keystore
 
@@ -30,9 +30,20 @@ module Slosilo
   
   module Extension
     def slosilo_keystore
-      extend KeystoreTable
+      extend Slosilo::Adapters::SequelAdapter::Migration
     end
   end
   
   Sequel::Database.send:include, Extension
+end
+
+Sequel.migration do
+  up do
+    slosilo_keystore
+    create_keystore_table
+  end
+  down do
+    slosilo_keystore
+    drop_keystore_table
+  end
 end

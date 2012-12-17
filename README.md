@@ -15,17 +15,7 @@ And then execute:
 
 Add a migration to create the necessary table:
 
-    require 'slosilo/keystore_table'
-    Sequel.migration do
-      up do
-        slosilo_keystore
-        create_keystore_table
-      end
-      down do
-        slosilo_keystore
-        drop_keystore_table
-      end
-    end
+    require 'slosilo/adapters/sequel_adapter/migration'
 
 Remember to migrate your database
 
