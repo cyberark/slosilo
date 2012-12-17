@@ -1,10 +1,11 @@
 module Slosilo
   class Symmetric
-    def initialize algo = 'aes-256-cbc'
-      @cipher = OpenSSL::Cipher.new algo
+    def initialize
+      @cipher = OpenSSL::Cipher.new 'AES-256-CTR'
     end
     
     def encrypt plaintext, opts = {}
+      @cipher.reset
       @cipher.encrypt
       @cipher.key = opts[:key]
       @cipher.iv = iv = random_iv
@@ -13,6 +14,7 @@ module Slosilo
     end
     
     def decrypt ciphertext, opts = {}
+      @cipher.reset
       @cipher.decrypt
       @cipher.key = opts[:key]
       @cipher.iv, ctxt = ciphertext.unpack("A#{@cipher.iv_len}A*")
