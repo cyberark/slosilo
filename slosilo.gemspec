@@ -15,8 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Slosilo::VERSION
   
-  gem.add_runtime_dependency 'attr_encrypted'
-  
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'simplecov'
 end

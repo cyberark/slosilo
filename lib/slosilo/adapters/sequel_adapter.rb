@@ -15,11 +15,11 @@ module Slosilo
       
       def put_key id, value
         key = StoredKey.new id, value
-        model.create id: key.id, encrypted_key: key.encrypted_key
+        model.create id: key.id, key: key.key
       end
       
       def get_key id
-        key = StoredKey.new id, model[id].encrypted_key
+        key = StoredKey.new id, model[id].key
         key.key
       end
     end
