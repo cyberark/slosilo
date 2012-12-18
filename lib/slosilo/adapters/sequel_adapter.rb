@@ -19,7 +19,9 @@ module Slosilo
       end
       
       def get_key id
-        key = StoredKey.new id, model[id].key
+        stored = model[id]
+        return nil unless stored
+        key = StoredKey.new id, stored.key
         key.key
       end
     end
