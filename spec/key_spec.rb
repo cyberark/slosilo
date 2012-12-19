@@ -57,4 +57,17 @@ describe Slosilo::Key do
       end
     end
   end
+  
+  describe "#signed_token" do
+    let(:time) { Time.new(2012,1,1,1,1,1,0) }
+    let(:data) { { foo: :bar } }
+    let(:token_to_sign) { { data: data, timestamp: "2012-01-01 01:01:01 UTC" } }
+    let(:signature) { "signature" }
+    before do
+      key.stub(:sign_string).with("[[\"data\",{\"foo\":\"bar\"}],[\"timestamp\",\"2012-01-01 01:01:01 UTC\"]]").and_return(signature)
+      Time.stub new: time
+    end
+    subject { key.signed_token data }
+    its([:signature]) { should == "c2lnbmF0dXJl" }
+  end
 end

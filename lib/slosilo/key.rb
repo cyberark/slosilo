@@ -1,5 +1,6 @@
 require 'openssl'
 require 'json'
+require 'base64'
 
 module Slosilo
   class Key
@@ -47,13 +48,20 @@ module Slosilo
         sign value.to_json
       end
     end
+
+    # create a new timestamped and signed token carrying data
+    def signed_token data
+      token = { data: data, timestamp: Time.new.utc.to_s }
+      token[:signature] = Base64::urlsafe_encode64(sign token)
+      token
+    end
     
-    private
     def sign_string value
       _salt = salt
       key.private_encrypt(hash_function.digest(_salt + value)) + _salt
     end
     
+    private
     def salt
       Slosilo::Random::salt
     end
