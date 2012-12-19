@@ -4,6 +4,13 @@ namespace :slosilo do
     args.with_defaults(:name => :own)
     puts Slosilo[args[:name]]
   end
+  
+  desc "Enroll a key"
+  task :enroll, [:name] => :environment do |t, args|
+    key = Slosilo::Key.new STDIN.read
+    Slosilo[args[:name]] = key
+    puts key
+  end
 
   desc "Generate a key pair"
   task :generate, [:name] => :environment do |t, args|
