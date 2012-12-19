@@ -24,6 +24,10 @@ module Slosilo
       keystore.get id
     end
     
+    def sign object
+      self[:own].sign object
+    end
+    
     attr_accessor :adapter
     
     private
