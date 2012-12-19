@@ -1,6 +1,5 @@
 require "slosilo/version"
 require "slosilo/keystore"
-require "slosilo/keypair"
 require "slosilo/symmetric"
 require "slosilo/attr_encrypted"
 

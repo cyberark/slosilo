@@ -1,8 +1,16 @@
+require 'openssl'
+
 module Slosilo
   class Key
-    def initialize raw_key
-      @key = OpenSSL::PKey.read raw_key
+    def initialize raw_key = nil
+      @key = if raw_key
+        OpenSSL::PKey.read raw_key
+      else
+        OpenSSL::PKey::RSA.new 2048
+      end
     end
+    
+    attr_reader :key
     
     def cipher
       @cipher ||= Slosilo::Symmetric.new

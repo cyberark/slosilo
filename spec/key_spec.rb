@@ -49,4 +49,15 @@ Dg1ikwi8GUF4HPZe9DyhXgDhg19wM/qcpjX8bSypsUWHWP+FanhjdWU=
       subject.decrypt(ciphertext, skey).should == plaintext
     end
   end
+  
+  describe '#initialize' do
+    context "when no argument given" do
+      subject { Slosilo::Key.new }
+      let (:key) { double "key" }
+      it "generates a new key pair" do
+        OpenSSL::PKey::RSA.should_receive(:new).with(2048).and_return(key)
+        subject.key.should == key
+      end
+    end
+  end
 end
