@@ -2,6 +2,7 @@ require "slosilo/version"
 require "slosilo/keystore"
 require "slosilo/symmetric"
 require "slosilo/attr_encrypted"
+require "slosilo/random"
 
 if defined? Sequel
   require 'slosilo/adapters/sequel_adapter'
