@@ -28,6 +28,10 @@ module Slosilo
       cipher.decrypt ciphertext, key: key
     end
     
+    def to_s
+      @key.public_key.to_pem
+    end
+    
     def to_der
       @key.to_der
     end
