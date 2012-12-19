@@ -1,7 +1,7 @@
 module Slosilo
   class Symmetric
     def initialize
-      @cipher = OpenSSL::Cipher.new 'AES-256-CTR'
+      @cipher = OpenSSL::Cipher.new 'AES-256-CBC'
     end
     
     def encrypt plaintext, opts = {}
