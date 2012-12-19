@@ -35,4 +35,26 @@ describe Slosilo::Key do
       end
     end
   end
+  
+  describe "#sign" do
+    context "when given a hash" do
+      it "converts to a sorted array and signs that" do
+        key.should_receive(:sign_string).with '[["a",3],["b",42]]'
+        key.sign b: 42, a: 3
+      end
+    end
+    context "when given an array" do
+      it "signs a JSON representation instead" do
+        key.should_receive(:sign_string).with '[2,[42,2]]'
+        key.sign [2, [42, 2]]
+      end
+    end
+    context "when given a string" do
+      let(:expected_signature) { "d[\xA4\x00\x02\xC5\x17\xF5P\x1AD\x91\xF9\xC1\x00P\x0EG\x14,IN\xDE\x17\xE1\xA2a\xCC\xABR\x99'\xB0A\xF5~\x93M/\x95-B\xB1\xB6\x92!\x1E\xEA\x9C\v\xC2O\xA8\x91\x1C\xF9\x11\x92a\xBFxm-\x93\x9C\xBBoM\x92%\xA9\xD06$\xC1\xBC.`\xF8\x03J\x16\xE1\xB0c\xDD\xBF\xB0\xAA\xD7\xD4\xF4\xFC\e*\xAB\x13A%-\xD3\t\xA5R\x18\x01let6\xC8\xE9\"\x7F6O\xC7p\x82\xAB\x04J(IY\xAA]b\xA4'\xD6\x873`\xAB\x13\x95g\x9C\x17\xCAB\xF8\xB9\x85B:^\xC5XY^\x03\xEA\xB6V\x17b2\xCA\xF5\xD6\xD4\xD2\xE3u\x11\xECQ\x0Fb\x14\xE2\x04\xE1<a\xC5\x01eW-\x15\x01X\x81K\x1A\xE5A\vVj\xBF\xFC\xFE#\xD5\x93y\x16\xDC\xB4\x8C\xF0\x02Y\xA8\x87i\x01qC\xA7#\xE8\f\xA5\xF0c\xDEJ\xB0\xDB BJ\x87\xA4\xB0\x92\x80\x03\x95\xEE\xE9\xB8K\xC0\xE3JbE-\xD4\xCBP\\\x13S\"\eZ\xE1\x93\xFDa pinch of salt" }
+      it "signs it" do
+        key.stub salt: 'a pinch of salt'
+        key.sign("this sentence is not this sentence").should == expected_signature
+      end
+    end
+  end
 end

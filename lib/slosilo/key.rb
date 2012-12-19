@@ -1,4 +1,5 @@
 require 'openssl'
+require 'json'
 
 module Slosilo
   class Key
@@ -34,6 +35,31 @@ module Slosilo
     
     def to_der
       @key.to_der
+    end
+    
+    def sign value
+      case value
+      when Hash
+        sign value.to_a.sort
+      when String
+        sign_string value
+      else
+        sign value.to_json
+      end
+    end
+    
+    private
+    def sign_string value
+      _salt = salt
+      key.private_encrypt(hash_function.digest(_salt + value)) + _salt
+    end
+    
+    def salt
+      Slosilo::Random::salt
+    end
+    
+    def hash_function
+      @hash_function ||= OpenSSL::Digest::SHA256
     end
   end
 end
