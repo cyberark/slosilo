@@ -27,5 +27,9 @@ module Slosilo
       key = @key.private_decrypt skey
       cipher.decrypt ciphertext, key: key
     end
+    
+    def to_der
+      @key.to_der
+    end
   end
 end

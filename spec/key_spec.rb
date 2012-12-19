@@ -4,6 +4,7 @@ describe Slosilo::Key do
   include_context "with example key"
   
   subject { key }
+  its(:to_der) { should == rsa.to_der }
   
   let(:plaintext) { 'quick brown fox jumped over the lazy dog' }
   describe '#encrypt' do
