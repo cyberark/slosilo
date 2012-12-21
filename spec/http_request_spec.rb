@@ -10,6 +10,14 @@ describe Slosilo::HTTPRequest do
   end
   
   describe "#encrypt!" do
+    context "when key not set" do
+      before { subject.keyname = nil }
+      it "does nothing" do
+        subject.should_not_receive(:body=)
+        encrypt
+      end
+    end
+    
     context "when requested key does not exist" do
       before { Slosilo.stub(:[]).and_return nil }
       it "raises error" do

@@ -1,6 +1,7 @@
 module Slosilo
   module HTTPRequest
     def encrypt!
+      return unless @keyname
       self.body, key = Slosilo[@keyname].encrypt body
       self['X-Slosilo-Key'] = Base64::urlsafe_encode64 key
     end
