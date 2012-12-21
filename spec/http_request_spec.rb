@@ -3,10 +3,40 @@ require 'spec_helper'
 describe Slosilo::HTTPRequest do
   let(:keyname) { :bacon }
   let(:encrypt) { subject.encrypt! }
-  subject { Object.new }
+  subject { Hash.new }
   before do 
     subject.extend Slosilo::HTTPRequest
     subject.keyname = keyname
+  end
+  
+  describe "#sign!" do
+    let(:own_key) { double "own key" }
+    before { Slosilo.stub(:[]).with(:own).and_return own_key }
+    
+    let(:signed_data) { "this is the truest truth" }
+    before { subject.stub signed_data: signed_data }
+    let(:timestamp) { "long time ago" }
+    let(:signature) { "seal of approval" }
+    let(:token) { { data: signed_data, timestamp: timestamp, signature: signature } }
+    
+    it "makes a token out of the data to sign and inserts headers" do
+      own_key.stub(:signed_token).with(signed_data).and_return token
+      subject.should_receive(:[]=).with 'Timestamp', timestamp
+      subject.should_receive(:[]=).with 'X-Slosilo-Signature', signature
+      subject.sign!
+    end
+  end
+  
+  describe "#signed_data" do
+    before { subject.stub path: :path, body: :body }
+    context "when X-Slosilo-Key not present" do
+      its(:signed_data) { should == { path: :path, body: :body } }
+    end
+    
+    context "when X-Slosilo-Key is present" do
+      before { subject.merge! 'X-Slosilo-Key' => :key } 
+      its(:signed_data) { should == { path: :path, body: :body, key: :key } }
+    end
   end
   
   describe "#encrypt!" do
