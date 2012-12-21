@@ -8,7 +8,16 @@ describe Slosilo::Rack::Middleware do
   subject { Slosilo::Rack::Middleware.new app }
   
   describe '#path' do
-    pending "joins the various rack environments variables into path?"
+    context "when QUERY_STRING is empty" do
+      let(:env) { { 'SCRIPT_NAME' => '/foo', 'PATH_INFO' => '/bar', 'QUERY_STRING' => '' } }
+      before { subject.stub env: env }
+      its(:path) { should == '/foo/bar' }
+    end
+    context "when QUERY_STRING is not" do
+      let(:env) { { 'SCRIPT_NAME' => '/foo', 'PATH_INFO' => '/bar', 'QUERY_STRING' => 'baz' } }
+      before { subject.stub env: env }
+      its(:path) { should == '/foo/bar?baz' }
+    end
   end
   
   describe '#call' do

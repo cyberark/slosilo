@@ -44,7 +44,11 @@ module Slosilo
       end
       
       def query_string
-        '?' + env['QUERY_STRING'] if env['QUERY_STRING'] 
+        if env['QUERY_STRING'].empty?
+          ''
+        else
+          '?' + env['QUERY_STRING']
+        end
       end
       
       def body
