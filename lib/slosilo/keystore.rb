@@ -13,6 +13,16 @@ module Slosilo
     def get id
       Key.new adapter.get_key(id.to_s)
     end
+    
+    def any? &block
+      catch :found do
+        adapter.each do |k|
+          throw :found if block.call(Key.new(k))
+        end
+        return false
+      end
+      true
+    end
   end
   
   class << self
@@ -26,6 +36,10 @@ module Slosilo
     
     def sign object
       self[:own].sign object
+    end
+    
+    def token_valid? token
+      keystore.any? { |k| k.token_valid? token }
     end
     
     attr_accessor :adapter
