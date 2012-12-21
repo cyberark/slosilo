@@ -41,4 +41,22 @@ Dg1ikwi8GUF4HPZe9DyhXgDhg19wM/qcpjX8bSypsUWHWP+FanhjdWU=
 -----END RSA PRIVATE KEY-----
         """ }
   let (:key) { Slosilo::Key.new rsa.to_der }
+  
+  def self.mock_own_key
+    before { Slosilo.stub(:[]).with(:own).and_return key }
+  end
+end
+
+class RackEnvironmentInputMatcher
+  def initialize expected
+    @expected = expected
+  end
+  
+  def == env
+    env['rack.input'].read.should == @expected
+  end
+end
+
+def rack_environment_with_input expected
+  RackEnvironmentInputMatcher.new expected
 end

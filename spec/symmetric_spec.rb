@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Slosilo::Symmetric do
+  # TODO transform it to class methods only?
   let(:plaintext) { "quick brown fox jumped over the lazy dog" }
   let(:key) { "^\xBAIv\xDB1\x0Fi\x04\x11\xFD\x14\xA7\xCD\xDFf\x93\xFE\x93}\v\x01\x11\x98\x14\xE0;\xC1\xE2 v\xA5" }
   let(:iv) { "\xA1\xFA#z\x16\x80R\xCC|\x0Fyc\xB7j\x17\xED" }

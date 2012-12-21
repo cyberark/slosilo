@@ -3,6 +3,7 @@ require "slosilo/keystore"
 require "slosilo/symmetric"
 require "slosilo/attr_encrypted"
 require "slosilo/random"
+require "slosilo/rack/middleware"
 
 if defined? Sequel
   require 'slosilo/adapters/sequel_adapter'
