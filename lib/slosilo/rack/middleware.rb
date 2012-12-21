@@ -1,11 +1,9 @@
 module Slosilo
   module Rack
     class Middleware
-      class BadEncryption < SecurityError
+      class EncryptionError < SecurityError
       end
-      class BadSignature < SecurityError
-      end
-      class SignatureRequired < SecurityError
+      class SignatureError < SecurityError
       end
 
       def initialize app, opts = {}
@@ -16,24 +14,23 @@ module Slosilo
       
       def call env
         @env = env
-        if decrypt(env) == :not_encrypted && encryption_required?
-          error 403, encryption_required_message
-        else
-          verify
-          @app.call env
-        end
-      rescue BadEncryption
-        error 403, bad_encryption_message
-      rescue SignatureRequired
-        error 401, "Signature required"
-      rescue BadSignature
-        error 401, "Bad signature"
+        
+        decrypt
+        verify
+        @app.call env
+      rescue EncryptionError
+        error 403, $!.message
+      rescue SignatureError
+        error 401, $!.message
       end
       
       private
       def verify
-        raise SignatureRequired unless !signature_required? || signature
-        raise BadSignature unless signature.nil? || Slosilo.token_valid?(token)
+        if signature
+          raise SignatureError, "Bad signature" unless Slosilo.token_valid?(token)
+        else
+          raise SignatureError, "Signature required" if signature_required?
+        end
       end
       
       attr_reader :env
@@ -62,29 +59,30 @@ module Slosilo
         env['HTTP_X_SLOSILO_SIGNATURE']
       end
       
-      def decrypt env
-        if key = env['HTTP_X_SLOSILO_KEY']
-          key = Base64::urlsafe_decode64(key)
-          ciphertext = env['rack.input'].read
-          plaintext = Slosilo[:own].decrypt ciphertext, key
-          env['rack.input'] = StringIO.new plaintext
+      def encoded_key
+        env['HTTP_X_SLOSILO_KEY']
+      end
+      
+      def key
+        if encoded_key
+          Base64::urlsafe_decode64(encoded_key)
         else
-          :not_encrypted
+          raise EncryptionError("Encryption required") if encryption_required?
         end
+      end
+      
+      def decrypt
+        return unless key
+        plaintext = Slosilo[:own].decrypt body, key
+        env['rack.input'] = StringIO.new plaintext
+      rescue EncryptionError
+        raise
       rescue Exception => e
-        raise BadEncryption.new e
+        raise EncryptionError, "Bad encryption", e.backtrace
       end
       
       def error status, message
         [status, { 'Content-Type' => 'text/plain', 'Content-Length' => message.length.to_s }, [message] ]
-      end
-      
-      def bad_encryption_message
-        "Bad encryption key used"
-      end
-      
-      def encryption_required_message
-        "Encryption is required"
       end
       
       def encryption_required?
