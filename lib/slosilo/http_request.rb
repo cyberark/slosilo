@@ -1,7 +1,17 @@
 module Slosilo
-  class HTTPRequest
-    def encrypt! keyname
-      self.body, self['X-Slosilo-Key'] = Slosilo[keyname].encrypt body
+  module HTTPRequest
+    def encrypt!
+      self.body, key = Slosilo[@keyname].encrypt body
+      self['X-Slosilo-Key'] = Base64::urlsafe_encode64 key
     end
+    
+    def exec *a
+      # we need to hook here because the body might be set
+      # in several ways and here it's hopefully finalized
+      encrypt!
+      super *a
+    end
+    
+    attr_accessor :keyname
   end
 end

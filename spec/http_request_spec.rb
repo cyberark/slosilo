@@ -1,10 +1,15 @@
 require 'spec_helper'
 
 describe Slosilo::HTTPRequest do
+  let(:keyname) { :bacon }
+  let(:encrypt) { subject.encrypt! }
+  subject { Object.new }
+  before do 
+    subject.extend Slosilo::HTTPRequest
+    subject.keyname = keyname
+  end
+  
   describe "#encrypt!" do
-    let(:keyname) { :bacon }
-    let(:encrypt) { subject.encrypt! keyname }
-    
     context "when requested key does not exist" do
       before { Slosilo.stub(:[]).and_return nil }
       it "raises error" do
@@ -26,9 +31,29 @@ describe Slosilo::HTTPRequest do
       
       it "encrypts the message body and adds the X-Slosilo-Key header" do
         subject.should_receive(:body=).with ciphertext
-        subject.should_receive(:[]=).with 'X-Slosilo-Key', skey
+        subject.should_receive(:[]=).with 'X-Slosilo-Key', Base64::urlsafe_encode64(skey)
         encrypt
       end
+    end
+  end
+  
+  describe "#exec" do
+    class Subject
+      def exec *a
+        "ok, got it"
+      end
+
+      def initialize keyname
+        extend Slosilo::HTTPRequest
+        self.keyname = keyname
+      end
+    end
+    
+    subject { Subject.new keyname }
+
+    it "encrypts and delegates to the superclass" do
+      subject.should_receive(:encrypt!)
+      subject.exec(:foo).should == "ok, got it"
     end
   end
 end
