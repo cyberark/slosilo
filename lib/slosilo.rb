@@ -4,6 +4,7 @@ require "slosilo/symmetric"
 require "slosilo/attr_encrypted"
 require "slosilo/random"
 require "slosilo/rack/middleware"
+require "slosilo/http_request"
 
 if defined? Sequel
   require 'slosilo/adapters/sequel_adapter'
