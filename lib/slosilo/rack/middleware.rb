@@ -34,7 +34,7 @@ module Slosilo
       end
       
       def error message
-        [403, { 'Content-Type' => 'text/plain', 'Content-Length' => message.length }, message ]
+        [403, { 'Content-Type' => 'text/plain', 'Content-Length' => message.length.to_s }, [message] ]
       end
       
       def bad_encryption_message
