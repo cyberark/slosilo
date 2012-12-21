@@ -89,8 +89,9 @@ describe Slosilo::HTTPRequest do
     
     subject { Subject.new keyname }
 
-    it "encrypts and delegates to the superclass" do
-      subject.should_receive(:encrypt!)
+    it "encrypts, then signs and delegates to the superclass" do
+      subject.should_receive(:encrypt!).once.ordered
+      subject.should_receive(:sign!).once.ordered
       subject.exec(:foo).should == "ok, got it"
     end
   end

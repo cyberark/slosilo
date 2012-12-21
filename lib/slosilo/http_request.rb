@@ -24,6 +24,7 @@ module Slosilo
       # we need to hook here because the body might be set
       # in several ways and here it's hopefully finalized
       encrypt!
+      sign!
       super *a
     end
     
