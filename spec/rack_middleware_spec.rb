@@ -4,7 +4,7 @@ describe Slosilo::Rack::Middleware do
   include_context "with example key"
   mock_own_key
   
-  let(:app) { double "app", call: nil }
+  let(:app) { double "app" }
   subject { Slosilo::Rack::Middleware.new app }
   
   describe '#call' do
@@ -14,6 +14,14 @@ describe Slosilo::Rack::Middleware do
       it "passes the env verbatim" do
         app.should_receive(:call).with(env).and_return(result)
         subject.call(env).should == result
+      end
+      
+      context "but encryption is required" do
+        subject { Slosilo::Rack::Middleware.new app, encryption_required: true }
+        it "returns 403" do
+          status, headers, body = subject.call(env)
+          status.should == 403
+        end
       end
     end
     

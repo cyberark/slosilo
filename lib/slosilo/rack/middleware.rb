@@ -4,15 +4,19 @@ module Slosilo
       class BadEncryption < SecurityError
       end
 
-      def initialize app
+      def initialize app, opts = {}
         @app = app
+        @encryption_required = opts[:encryption_required] || false
       end
       
       def call env
-        decrypt env
-        @app.call env
+        if decrypt(env) == :not_encrypted && encryption_required?
+          error encryption_required_message
+        else
+          @app.call env
+        end
       rescue BadEncryption
-        error
+        error bad_encryption_message
       end
       
       private
@@ -29,12 +33,20 @@ module Slosilo
         raise BadEncryption.new e
       end
       
-      def error
-        [403, { 'Content-Type' => 'text/plain', 'Content-Length' => error_message.length }, error_message ]
+      def error message
+        [403, { 'Content-Type' => 'text/plain', 'Content-Length' => message.length }, message ]
       end
       
-      def error_message
+      def bad_encryption_message
         "Bad encryption key used"
+      end
+      
+      def encryption_required_message
+        "Encryption is required"
+      end
+      
+      def encryption_required?
+        @encryption_required
       end
     end
   end
