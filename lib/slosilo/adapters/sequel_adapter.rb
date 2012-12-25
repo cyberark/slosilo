@@ -10,24 +10,23 @@ module Slosilo
       def create_model
         model = Sequel::Model(:slosilo_keystore)
         model.unrestrict_primary_key
+        model.attr_encrypted :key
         model
       end
       
       def put_key id, value
-        key = StoredKey.new id, value
         model.create id: key.id, key: key.key
       end
       
       def get_key id
         stored = model[id]
         return nil unless stored
-        key = StoredKey.new id, stored.key
-        key.key
+        stored.key
       end
       
       def each
         model.each do |m|
-          yield (StoredKey.new m.id, m.key).key
+          yield m.key
         end
       end
     end
