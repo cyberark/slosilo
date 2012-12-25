@@ -14,4 +14,17 @@ describe Slosilo::Adapters::SequelAdapter do
       end
     end
   end
+  
+  let(:adapter) { subject }
+  describe "#each" do
+    let(:one) { double("one", id: :one, key: :onek) }
+    let(:two) { double("two", id: :two, key: :twok) }
+    before { model.stub(:each).and_yield(one).and_yield(two) }
+    
+    it "iterates over each key" do
+      results = []
+      adapter.each { |x| results << x }
+      results.should == [:onek, :twok]
+    end
+  end
 end

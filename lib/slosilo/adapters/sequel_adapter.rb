@@ -24,6 +24,12 @@ module Slosilo
         key = StoredKey.new id, stored.key
         key.key
       end
+      
+      def each
+        model.each do |m|
+          yield (StoredKey.new m.id, m.key).key
+        end
+      end
     end
   end
 end
