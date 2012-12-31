@@ -15,8 +15,8 @@ module Slosilo
       def call env
         @env = env
         
-        decrypt
         verify
+        decrypt
         @app.call env
       rescue EncryptionError
         error 403, $!.message
@@ -27,6 +27,7 @@ module Slosilo
       private
       def verify
         if signature
+          puts "looking at token: #{token.inspect}"
           raise SignatureError, "Bad signature" unless Slosilo.token_valid?(token)
         else
           raise SignatureError, "Signature required" if signature_required?
@@ -52,7 +53,7 @@ module Slosilo
       end
       
       def body
-        env['rack.input'].read
+        @body ||= env['rack.input'].read
       end
       
       def timestamp
