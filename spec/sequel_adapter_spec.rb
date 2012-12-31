@@ -27,4 +27,25 @@ describe Slosilo::Adapters::SequelAdapter do
       results.should == [:onek, :twok]
     end
   end
+  
+  describe '#model' do
+    let(:db) { Sequel.sqlite }
+    before do
+      Slosilo::encryption_key = Slosilo::Symmetric.new.random_key
+      subject.unstub :create_model
+      require 'sequel'
+      Sequel::Model.db = db
+      Sequel.extension :migration
+      require 'slosilo/adapters/sequel_adapter/migration'
+      Sequel::Migration::descendants.first.apply db, :up
+    end
+      
+    let(:key) { 'fake key' }
+    let(:id) { 'some id' }
+    it "transforms (encrypts) the key" do
+      subject.model.create id: id, key: key
+      db[:slosilo_keystore][id: id][:key].should_not == key
+      subject.model[id].key.should == key
+    end
+  end
 end
