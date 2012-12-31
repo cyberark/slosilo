@@ -14,6 +14,7 @@ module Slosilo
       
       def call env
         @env = env
+        @body = env['rack.input'].read rescue ""
         
         verify
         decrypt
@@ -27,7 +28,6 @@ module Slosilo
       private
       def verify
         if signature
-          puts "looking at token: #{token.inspect}"
           raise SignatureError, "Bad signature" unless Slosilo.token_valid?(token)
         else
           raise SignatureError, "Signature required" if signature_required?
@@ -37,7 +37,10 @@ module Slosilo
       attr_reader :env
       
       def token
-        { data: { path: path, body: body }, timestamp: timestamp, signature: signature } if signature
+        return nil unless signature
+        t = { data: { path: path, body: [body].pack('m0') }, timestamp: timestamp, signature: signature }
+        t[:data][:key] = encoded_key if encoded_key
+        t
       end
       
       def path
@@ -51,10 +54,8 @@ module Slosilo
           '?' + env['QUERY_STRING']
         end
       end
-      
-      def body
-        @body ||= env['rack.input'].read
-      end
+
+      attr_reader :body
       
       def timestamp
         env['HTTP_TIMESTAMP']

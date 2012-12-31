@@ -28,14 +28,14 @@ describe Slosilo::HTTPRequest do
   end
   
   describe "#signed_data" do
-    before { subject.stub path: :path, body: :body }
+    before { subject.stub path: :path, body: 'body' }
     context "when X-Slosilo-Key not present" do
-      its(:signed_data) { should == { path: :path, body: :body } }
+      its(:signed_data) { should == { path: :path, body: "Ym9keQ==" } }
     end
     
     context "when X-Slosilo-Key is present" do
       before { subject.merge! 'X-Slosilo-Key' => :key } 
-      its(:signed_data) { should == { path: :path, body: :body, key: :key } }
+      its(:signed_data) { should == { path: :path, body: "Ym9keQ==", key: :key } }
     end
   end
   

@@ -13,7 +13,7 @@ module Slosilo
     end
     
     def signed_data
-      data = { path: path, body: body }
+      data = { path: path, body: [body].pack('m0') }
       if key = self['X-Slosilo-Key']
         data[:key] = key
       end
