@@ -48,6 +48,8 @@ module Slosilo
     def verify_signature data, signature
       signature, salt = signature.unpack("A#{SIGNATURE_LEN}A*")
       key.public_decrypt(signature) == hash_function.digest(salt + stringify(data))
+    rescue
+      false
     end
 
     # create a new timestamped and signed token carrying data
