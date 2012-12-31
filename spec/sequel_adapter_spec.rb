@@ -15,6 +15,15 @@ describe Slosilo::Adapters::SequelAdapter do
     end
   end
   
+  describe "#put_key" do
+    let(:id) { "id" }
+    let(:key) { "key" }
+    it "creates the key" do
+      model.should_receive(:create).with id: id, key: key
+      subject.put_key id, key
+    end
+  end
+  
   let(:adapter) { subject }
   describe "#each" do
     let(:one) { double("one", id: :one, key: :onek) }

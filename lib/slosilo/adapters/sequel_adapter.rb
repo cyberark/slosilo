@@ -15,7 +15,7 @@ module Slosilo
       end
       
       def put_key id, value
-        model.create id: key.id, key: key.key
+        model.create id: id, key: value
       end
       
       def get_key id
