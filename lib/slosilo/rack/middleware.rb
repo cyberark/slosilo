@@ -1,5 +1,21 @@
 module Slosilo
   module Rack
+    # Con perform verification of request signature and decryption of request body.
+    #
+    # Signature verification and body decryption are enabled with constructor switches and are 
+    # therefore performed (or not) for all requests.
+    #
+    # When signature verification is performed, the following elements are included in the 
+    # signature string:
+    # 
+    # 1. Request path and query string
+    # 2. base64 encoded request body
+    # 3. Request timestamp from HTTP_TIMESTAMP
+    # 4. Body encryption key from HTTP_X_SLOSILO_KEY (if present)
+    # 
+    # When body decryption is performed, an encryption key for the message body is encrypted
+    # with this service's public key and placed in HTTP_X_SLOSILO_KEY. This middleware
+    # decryps the key using our :own private key, and then decrypts the body using the decrypted key.
     class Middleware
       class EncryptionError < SecurityError
       end
