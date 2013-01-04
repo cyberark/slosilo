@@ -7,14 +7,14 @@ describe Slosilo::Symmetric do
   let(:iv) { "\xA1\xFA#z\x16\x80R\xCC|\x0Fyc\xB7j\x17\xED" }
   let(:ciphertext) { "\xA1\xFA#z\x16\x80R\xCC|\x0Fyc\xB7j\x17\xED\x15\xC9r\xC9\xEE\xB9\xBC5\xB7\ni\x0F\f\xC8X\x80 h\a\xF4\xA6\xE3\x15\x9D\xF1-\xE5\bs\xF6\x02Z\x0F\xCD|S\x1A\xAA\x9At\xEFT\x17\xA5lT\x8C\xF3" }
   describe '#encrypt' do
-    it "encrypts with AES-256-CTR" do
+    it "encrypts with AES-256-CBC" do
       subject.stub random_iv: iv
       subject.encrypt(plaintext, key: key).should == ciphertext
     end
   end
   
   describe '#decrypt' do
-    it "decrypts with AES-256-CTR" do
+    it "decrypts with AES-256-CBC" do
       subject.decrypt(ciphertext, key: key).should == plaintext
     end
   end
