@@ -15,7 +15,9 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Slosilo::VERSION
   
+  gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'ci_reporter'
   gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'sequel' # for sequel tests
   gem.add_development_dependency 'sqlite3' # for sequel tests
