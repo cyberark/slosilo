@@ -26,7 +26,7 @@ module Slosilo
       
       def each
         model.each do |m|
-          yield m.key
+          yield m.id, m.key
         end
       end
     end

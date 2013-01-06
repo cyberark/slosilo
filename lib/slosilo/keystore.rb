@@ -14,9 +14,13 @@ module Slosilo
       Key.new adapter.get_key(id.to_s)
     end
     
+    def each(&block)
+      adapter.each(&block)
+    end
+    
     def any? &block
       catch :found do
-        adapter.each do |k|
+        adapter.each do |id, k|
           throw :found if block.call(Key.new(k))
         end
         return false
@@ -32,6 +36,10 @@ module Slosilo
     
     def [] id
       keystore.get id
+    end
+    
+    def each(&block)
+      keystore.each(&block)
     end
     
     def sign object

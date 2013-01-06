@@ -32,8 +32,8 @@ describe Slosilo::Adapters::SequelAdapter do
     
     it "iterates over each key" do
       results = []
-      adapter.each { |x| results << x }
-      results.should == [:onek, :twok]
+      adapter.each { |id,k| results << { id => k } }
+      results.should == [ { one: :onek}, {two: :twok } ]
     end
   end
   
