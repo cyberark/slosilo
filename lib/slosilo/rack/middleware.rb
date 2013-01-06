@@ -32,13 +32,16 @@ module Slosilo
         @env = env
         @body = env['rack.input'].read rescue ""
         
-        verify
-        decrypt
+        begin
+          verify
+          decrypt
+        rescue EncryptionError
+          return error 403, $!.message
+        rescue SignatureError
+          return error 401, $!.message
+        end
+        
         @app.call env
-      rescue EncryptionError
-        error 403, $!.message
-      rescue SignatureError
-        error 401, $!.message
       end
       
       private
