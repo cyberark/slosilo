@@ -13,3 +13,5 @@ task :jenkins do
   Rake::Task["ci:setup:rspec"].invoke
   Rake::Task["spec"].invoke
 end
+
+task :default => :spec
