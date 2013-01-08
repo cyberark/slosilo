@@ -92,7 +92,7 @@ module Slosilo
         if encoded_key
           Base64::urlsafe_decode64(encoded_key)
         else
-          raise EncryptionError("Encryption required") if encryption_required?
+          raise EncryptionError, "Encryption required" if encryption_required?
         end
       end
       
@@ -101,7 +101,7 @@ module Slosilo
         plaintext = Slosilo[:own].decrypt body, key
         env['rack.input'] = StringIO.new plaintext
       rescue EncryptionError
-        raise
+        raise unless body.empty? || body.nil?
       rescue Exception => e
         raise EncryptionError, "Bad encryption", e.backtrace
       end

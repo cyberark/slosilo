@@ -57,20 +57,29 @@ describe Slosilo::HTTPRequest do
     
     context "when the key exists" do
       let(:key) { double "key" }
-      before do 
-        key.stub(:encrypt).with(plaintext).and_return([ciphertext, skey])
-        Slosilo.stub(:[]).with(keyname).and_return key
+      context "when the body is not empty" do
+        let(:plaintext) { "Keep your solutions close, and your problems closer." }
+        let(:ciphertext) { "And, when you want something, all the universe conspires in helping you to achieve it." }
+        let(:skey) { "make me sound like a fool instead" }
+        before do 
+          subject.stub body: plaintext
+          key.stub(:encrypt).with(plaintext).and_return([ciphertext, skey])
+          Slosilo.stub(:[]).with(keyname).and_return key
+        end
+        
+        it "encrypts the message body and adds the X-Slosilo-Key header" do
+          subject.should_receive(:body=).with ciphertext
+          subject.should_receive(:[]=).with 'X-Slosilo-Key', Base64::urlsafe_encode64(skey)
+          encrypt
+        end
       end
       
-      let(:plaintext) { "Keep your solutions close, and your problems closer." }
-      before { subject.stub body: plaintext }
-      let(:ciphertext) { "And, when you want something, all the universe conspires in helping you to achieve it." }
-      let(:skey) { "make me sound like a fool instead" }
-      
-      it "encrypts the message body and adds the X-Slosilo-Key header" do
-        subject.should_receive(:body=).with ciphertext
-        subject.should_receive(:[]=).with 'X-Slosilo-Key', Base64::urlsafe_encode64(skey)
-        encrypt
+      context "when the body is empty" do
+        before { subject.stub body: "" }
+        it "doesn't set the key header" do
+          subject.should_not_receive(:[]=).with 'X-Slosilo-Key'
+          encrypt
+        end
       end
     end
   end

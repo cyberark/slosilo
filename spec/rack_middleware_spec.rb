@@ -55,9 +55,22 @@ describe Slosilo::Rack::Middleware do
 
       context "but encryption is required" do
         subject { Slosilo::Rack::Middleware.new app, encryption_required: true }
-        it "returns 403" do
-          status, headers, body = call
-          status.should == 403
+        context "and the body is not empty" do
+          let(:env) { {'rack.input' => StringIO.new('foo') } }
+          it "returns 403" do
+            status, headers, body = call
+            status.should == 403
+          end
+        end
+        context "but the body is empty" do
+          subject { Slosilo::Rack::Middleware.new app, encryption_required: true, signature_required: false }
+          let(:body) { "" }
+          let(:timestamp) { "long time ago" }
+          let(:env) { {'rack.input' => StringIO.new(body) } }
+          it "passes the env verbatim" do
+            app.should_receive(:call).with(env).and_return(result)
+            call.should == result
+          end
         end
       end
     end
