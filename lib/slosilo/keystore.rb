@@ -3,7 +3,7 @@ require 'slosilo/key'
 module Slosilo
   class Keystore
     def adapter 
-      @adapter ||= Slosilo::adapter
+      @adapter ||= Slosilo::adapter or raise "No Slosilo adapter is configured or available"
     end
     
     def put id, key
