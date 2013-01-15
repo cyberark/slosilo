@@ -34,7 +34,7 @@ module Slosilo
     end
   end
   
-  Sequel::Database.send:include, Extension
+  Sequel::Database.send :include, Extension
 end
 
 Sequel.migration do
