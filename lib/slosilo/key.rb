@@ -6,8 +6,10 @@ require 'time'
 module Slosilo
   class Key
     def initialize raw_key = nil
-      @key = if raw_key
-        OpenSSL::PKey.read raw_key rescue raw_key
+      @key = if raw_key.is_a? OpenSSL::PKey::RSA
+        raw_key
+      elsif !raw_key.nil?
+        OpenSSL::PKey.read raw_key
       else
         OpenSSL::PKey::RSA.new 2048
       end

@@ -34,6 +34,20 @@ describe Slosilo::Key do
         subject.key.should == rsa
       end
     end
+    context "when given an armored key" do
+      subject { Slosilo::Key.new rsa.to_der }
+      its(:to_der) { should == rsa.to_der }
+    end
+    context "when given a key instance" do
+      subject { Slosilo::Key.new rsa }
+      its(:to_der) { should == rsa.to_der }
+    end
+    context "when given something else" do
+      subject { Slosilo::Key.new "foo" }
+      it "fails early" do
+        expect { subject }.to raise_error
+      end
+    end
   end
   
   describe "#sign" do
