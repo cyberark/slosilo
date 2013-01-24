@@ -56,15 +56,15 @@ module Slosilo
 
     # create a new timestamped and signed token carrying data
     def signed_token data
-      token = { data: data, timestamp: Time.new.utc.to_s }
-      token[:signature] = Base64::urlsafe_encode64(sign token)
+      token = { "data" => data, "timestamp" => Time.new.utc.to_s }
+      token["signature"] = Base64::urlsafe_encode64(sign token)
       token
     end
     
     def token_valid? token, expiry = 8 * 60
       token = token.clone
-      signature = Base64::urlsafe_decode64(token.delete :signature)
-      (Time.parse(token[:timestamp]) + expiry > Time.now) && verify_signature(token, signature)
+      signature = Base64::urlsafe_decode64(token.delete "signature")
+      (Time.parse(token["timestamp"]) + expiry > Time.now) && verify_signature(token, signature)
     end
     
     def sign_string value

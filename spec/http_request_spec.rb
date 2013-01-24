@@ -17,7 +17,7 @@ describe Slosilo::HTTPRequest do
     before { subject.stub signed_data: signed_data }
     let(:timestamp) { "long time ago" }
     let(:signature) { "seal of approval" }
-    let(:token) { { data: signed_data, timestamp: timestamp, signature: signature } }
+    let(:token) { { "data" => signed_data, "timestamp" => timestamp, "signature" => signature } }
     
     it "makes a token out of the data to sign and inserts headers" do
       own_key.stub(:signed_token).with(signed_data).and_return token
@@ -30,12 +30,12 @@ describe Slosilo::HTTPRequest do
   describe "#signed_data" do
     before { subject.stub path: :path, body: 'body' }
     context "when X-Slosilo-Key not present" do
-      its(:signed_data) { should == { path: :path, body: "Ym9keQ==" } }
+      its(:signed_data) { should == { "path" => :path, "body" => "Ym9keQ==" } }
     end
     
     context "when X-Slosilo-Key is present" do
       before { subject.merge! 'X-Slosilo-Key' => :key } 
-      its(:signed_data) { should == { path: :path, body: "Ym9keQ==", key: :key } }
+      its(:signed_data) { should == { "path" => :path, "body" => "Ym9keQ==", "key" => :key } }
     end
   end
   

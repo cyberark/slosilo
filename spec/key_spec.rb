@@ -74,12 +74,12 @@ describe Slosilo::Key do
   
   describe "#signed_token" do
     let(:time) { Time.new(2012,1,1,1,1,1,0) }
-    let(:data) { { foo: :bar } }
-    let(:token_to_sign) { { data: data, timestamp: "2012-01-01 01:01:01 UTC" } }
+    let(:data) { { "foo" => :bar } }
+    let(:token_to_sign) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC" } }
     let(:signature) { "signature" }
     let(:salt) { 'a pinch of salt' }
     let(:expected_signature) { Base64::urlsafe_encode64 "\xB0\xCE{\x9FP\xEDV\x9C\xE7b\x8B[\xFAil\x87^\x96\x17Z\x97\x1D\xC2?B\x96\x9C\x8Ep-\xDF_\x8F\xC21\xD9^\xBC\n\x16\x04\x8DJ\xF6\xAF-\xEC\xAD\x03\xF9\xEE:\xDF\xB5\x8F\xF9\xF6\x81m\xAB\x9C\xAB1\x1E\x837\x8C\xFB\xA8P\xA8<\xEA\x1Dx\xCEd\xED\x84f\xA7\xB5t`\x96\xCC\x0F\xA9t\x8B\x9Fo\xBF\x92K\xFA\xFD\xC5?\x8F\xC68t\xBC\x9F\xDE\n$\xCA\xD2\x8F\x96\x0EtX2\x8Cl\x1E\x8Aa\r\x8D\xCAi\x86\x1A\xBD\x1D\xF7\xBC\x8561j\x91YlO\xFA(\x98\x10iq\xCC\xAF\x9BV\xC6\v\xBC\x10Xm\xCD\xFE\xAD=\xAA\x95,\xB4\xF7\xE8W\xB8\x83;\x81\x88\xE6\x01\xBA\xA5F\x91\x17\f\xCE\x80\x8E\v\x83\x9D<\x0E\x83\xF6\x8D\x03\xC0\xE8A\xD7\x90i\x1D\x030VA\x906D\x10\xA0\xDE\x12\xEF\x06M\xD8\x8B\xA9W\xC8\x9DTc\x8AJ\xA4\xC0\xD3!\xFA\x14\x89\xD1p\xB4J7\xA5\x04\xC2l\xDC8<\x04Y\xD8\xA4\xFB[\x89\xB1\xEC\xDA\xB8\xD7\xEA\x03Ja pinch of salt" }
-    let(:expected_token) { { data: data, timestamp: "2012-01-01 01:01:01 UTC", signature: expected_signature } }
+    let(:expected_token) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC", "signature" => expected_signature } }
     before do
       key.stub salt: salt
       Time.stub new: time
@@ -89,9 +89,9 @@ describe Slosilo::Key do
   end
   
   describe "#token_valid?" do
-    let(:data) { { foo: :bar } }
+    let(:data) { { "foo" => :bar } }
     let(:signature) { Base64::urlsafe_encode64 "\xB0\xCE{\x9FP\xEDV\x9C\xE7b\x8B[\xFAil\x87^\x96\x17Z\x97\x1D\xC2?B\x96\x9C\x8Ep-\xDF_\x8F\xC21\xD9^\xBC\n\x16\x04\x8DJ\xF6\xAF-\xEC\xAD\x03\xF9\xEE:\xDF\xB5\x8F\xF9\xF6\x81m\xAB\x9C\xAB1\x1E\x837\x8C\xFB\xA8P\xA8<\xEA\x1Dx\xCEd\xED\x84f\xA7\xB5t`\x96\xCC\x0F\xA9t\x8B\x9Fo\xBF\x92K\xFA\xFD\xC5?\x8F\xC68t\xBC\x9F\xDE\n$\xCA\xD2\x8F\x96\x0EtX2\x8Cl\x1E\x8Aa\r\x8D\xCAi\x86\x1A\xBD\x1D\xF7\xBC\x8561j\x91YlO\xFA(\x98\x10iq\xCC\xAF\x9BV\xC6\v\xBC\x10Xm\xCD\xFE\xAD=\xAA\x95,\xB4\xF7\xE8W\xB8\x83;\x81\x88\xE6\x01\xBA\xA5F\x91\x17\f\xCE\x80\x8E\v\x83\x9D<\x0E\x83\xF6\x8D\x03\xC0\xE8A\xD7\x90i\x1D\x030VA\x906D\x10\xA0\xDE\x12\xEF\x06M\xD8\x8B\xA9W\xC8\x9DTc\x8AJ\xA4\xC0\xD3!\xFA\x14\x89\xD1p\xB4J7\xA5\x04\xC2l\xDC8<\x04Y\xD8\xA4\xFB[\x89\xB1\xEC\xDA\xB8\xD7\xEA\x03Ja pinch of salt" }
-    let(:token) { { data: data, timestamp: "2012-01-01 01:01:01 UTC", signature: signature } }
+    let(:token) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC", "signature" => signature } }
     before { Time.stub now: Time.new(2012,1,1,1,2,1,0) }
     subject { key.token_valid? token }
     it { should be_true }
@@ -99,12 +99,12 @@ describe Slosilo::Key do
       before { Time.stub now: Time.new(2012,1,1,2,1,1,0) }
       it { should be_false }
       context "when timestamp in the token is changed accordingly" do
-        let(:token) { { data: data, timestamp: "2012-01-01 02:00:01 UTC", signature: signature } }
+        let(:token) { { "data" => data, "timestamp" => "2012-01-01 02:00:01 UTC", "signature" => signature } }
         it { should be_false }
       end
     end
     context "when the data is changed" do
-      let(:data) { { foo: :baz } }
+      let(:data) { { "foo" => :baz } }
       it { should be_false }
     end
     context "when RSA decrypt raises an error" do

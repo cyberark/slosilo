@@ -37,7 +37,7 @@ describe Slosilo::Rack::Middleware do
         let(:timestamp) { "long time ago" }
         let(:signature) { "in blood" }
         let(:env) { {'rack.input' => StringIO.new(body), 'HTTP_TIMESTAMP' => timestamp, 'HTTP_X_SLOSILO_SIGNATURE' => signature } }
-        let(:token) { { data: { path: path, body: "dGhlIGJvZHk=" }, timestamp: timestamp, signature: signature } }
+        let(:token) { { "data" => { "path" => path, "body" => "dGhlIGJvZHk=" }, "timestamp" => timestamp, "signature" => signature } }
         context "when the signature is valid" do
           before { Slosilo.stub(:token_valid?).with(token).and_return true }
           it "passes the env verbatim" do

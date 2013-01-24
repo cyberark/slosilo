@@ -57,8 +57,8 @@ module Slosilo
       
       def token
         return nil unless signature
-        t = { data: { path: path, body: [body].pack('m0') }, timestamp: timestamp, signature: signature }
-        t[:data][:key] = encoded_key if encoded_key
+        t = { "data" => { "path" => path, "body" => [body].pack('m0') }, "timestamp" => timestamp, "signature" => signature }
+        t["data"]["key"] = encoded_key if encoded_key
         t
       end
       

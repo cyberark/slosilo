@@ -9,14 +9,14 @@ module Slosilo
     
     def sign!
       token = Slosilo[:own].signed_token signed_data
-      self['Timestamp'] = token[:timestamp]
-      self['X-Slosilo-Signature'] = token[:signature]
+      self['Timestamp'] = token["timestamp"]
+      self['X-Slosilo-Signature'] = token["signature"]
     end
     
     def signed_data
-      data = { path: path, body: [body].pack('m0') }
+      data = { "path" => path, "body" => [body].pack('m0') }
       if key = self['X-Slosilo-Key']
-        data[:key] = key
+        data["key"] = key
       end
       data
     end
