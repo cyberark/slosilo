@@ -59,6 +59,7 @@ module Slosilo
         return nil unless signature
         t = { "data" => { "path" => path, "body" => [body].pack('m0') }, "timestamp" => timestamp, "signature" => signature }
         t["data"]["key"] = encoded_key if encoded_key
+        t['data']['authorization'] = env['HTTP_AUTHORIZATION'] if env['HTTP_AUTHORIZATION']
         t
       end
       

@@ -18,6 +18,9 @@ module Slosilo
       if key = self['X-Slosilo-Key']
         data["key"] = key
       end
+      if authz = self['Authorization']
+        data["authorization"] = authz
+      end
       data
     end
     
