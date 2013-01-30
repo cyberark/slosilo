@@ -40,7 +40,7 @@ describe Slosilo do
     subject { Slosilo.token_valid? token }
     
     context "when no key validates the token" do
-      before { Slosilo::Key.any_instance.stub token_valid?: false }
+      before { Slosilo::Key.stub new: (double "key", token_valid?: false) }
       it { should be_false }
     end
     
