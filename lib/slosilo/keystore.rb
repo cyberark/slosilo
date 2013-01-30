@@ -11,7 +11,8 @@ module Slosilo
     end
     
     def get id
-      Key.new adapter.get_key(id.to_s)
+      key = adapter.get_key(id.to_s)
+      key && Key.new(key)
     end
     
     def each(&block)

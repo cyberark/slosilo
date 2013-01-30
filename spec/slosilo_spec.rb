@@ -9,6 +9,12 @@ describe Slosilo do
     it "returns a Slosilo::Key" do
       Slosilo[:test].should be_instance_of Slosilo::Key
     end
+    
+    context "when the requested key does not exist" do
+      it "returns nil instead of creating a new key" do
+        Slosilo[:aether].should_not be
+      end
+    end
   end
   
   describe '.sign' do
