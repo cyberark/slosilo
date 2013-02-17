@@ -38,7 +38,7 @@ module Slosilo
       end
 
       def key
-        Slosilo::encryption_key
+        Slosilo::encryption_key || (raise "Please set Slosilo::encryption_key")
       end
       
       def cipher
@@ -51,7 +51,7 @@ module Slosilo
     attr_writer :encryption_key
     
     def encryption_key
-      @encryption_key || (raise "Please set Slosilo::encryption_key")
+      @encryption_key
     end
   end
 end
