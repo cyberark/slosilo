@@ -48,7 +48,7 @@ module Slosilo
     SIGNATURE_LEN = 256
     
     def verify_signature data, signature
-      signature, salt = signature.unpack("A#{SIGNATURE_LEN}A*")
+      signature, salt = signature.unpack("a#{SIGNATURE_LEN}a*")
       key.public_decrypt(signature) == hash_function.digest(salt + stringify(data))
     rescue
       false

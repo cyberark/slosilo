@@ -17,7 +17,7 @@ module Slosilo
       @cipher.reset
       @cipher.decrypt
       @cipher.key = opts[:key]
-      @cipher.iv, ctxt = ciphertext.unpack("A#{@cipher.iv_len}A*")
+      @cipher.iv, ctxt = ciphertext.unpack("a#{@cipher.iv_len}a*")
       ptxt = @cipher.update(ctxt)
       ptxt + @cipher.final
     end
