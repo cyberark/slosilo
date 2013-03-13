@@ -58,12 +58,15 @@ module Slosilo
     def signed_token data
       token = { "data" => data, "timestamp" => Time.new.utc.to_s }
       token["signature"] = Base64::urlsafe_encode64(sign token)
+      token["key"] = fingerprint
       token
     end
     
     def token_valid? token, expiry = 8 * 60
       token = token.clone
       signature = Base64::urlsafe_decode64(token.delete "signature")
+      expected_key = token.delete "key"
+      return false if expected_key and expected_key != fingerprint
       (Time.parse(token["timestamp"]) + expiry > Time.now) && verify_signature(token, signature)
     end
     

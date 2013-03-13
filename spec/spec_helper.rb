@@ -41,6 +41,7 @@ Dg1ikwi8GUF4HPZe9DyhXgDhg19wM/qcpjX8bSypsUWHWP+FanhjdWU=
 -----END RSA PRIVATE KEY-----
         """ }
   let (:key) { Slosilo::Key.new rsa.to_der }
+  let (:key_fingerprint) { "d28e3a347e368416b3129a40c1b887fe" }
   
   def self.mock_own_key
     before { Slosilo.stub(:[]).with(:own).and_return key }
