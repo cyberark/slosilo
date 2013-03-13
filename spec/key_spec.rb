@@ -6,6 +6,7 @@ describe Slosilo::Key do
   subject { key }
   its(:to_der) { should == rsa.to_der }
   its(:to_s) { should == rsa.public_key.to_pem }
+  its(:fingerprint) { should == "d28e3a347e368416b3129a40c1b887fe" }
   
   let(:plaintext) { 'quick brown fox jumped over the lazy dog' }
   describe '#encrypt' do

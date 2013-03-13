@@ -72,6 +72,10 @@ module Slosilo
       key.private_encrypt(hash_function.digest(_salt + value)) + _salt
     end
     
+    def fingerprint
+      OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+    end
+    
     private
     def stringify value
       case value
