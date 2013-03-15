@@ -15,7 +15,10 @@ module Slosilo
 
     # Create the table for holding keys
     def create_keystore_table
-      create_table keystore_table do
+      # docs say to not use create_table? in migration;
+      # but we really want this to be robust in case there are any previous installs
+      # and we can't use table_exists? because it rolls back
+      create_table? keystore_table do
         String :id, primary_key: true
         # Note: currently only postgres is supported
         bytea :key, null: false
