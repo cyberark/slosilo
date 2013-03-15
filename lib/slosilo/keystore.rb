@@ -15,18 +15,15 @@ module Slosilo
       key && Key.new(key)
     end
     
-    def each(&block)
-      adapter.each(&block)
+    def each &_
+      adapter.each { |k, v| yield k, Key.new(v) }
     end
     
     def any? &block
-      catch :found do
-        adapter.each do |id, k|
-          throw :found if block.call(Key.new(k))
-        end
-        return false
+      each do |_, k|
+        return true if yield k
       end
-      true
+      return false
     end
   end
   
