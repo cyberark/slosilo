@@ -55,4 +55,23 @@ describe Slosilo do
       it { should be_true }
     end
   end
+  
+  describe '.token_signer' do
+    let(:token) { double "token" }
+    let(:key_one) { double "key", token_valid?: false }
+    let(:other_key) { double "another key", token_valid?: false }
+    
+    before do
+      subject.stub(:each).and_yield('test', key_one).and_yield('other', other_key)
+    end
+    
+    it "returns nil when token doesn't have a valid signature from any known key" do
+      subject.token_signer(token).should_not be
+    end
+    
+    it "returns the name of the key which validates the token" do
+      other_key.stub(:token_valid?).with(token).and_return true
+      subject.token_signer(token).to_s.should == 'other'
+    end
+  end
 end

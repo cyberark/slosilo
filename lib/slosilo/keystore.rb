@@ -48,6 +48,13 @@ module Slosilo
       keystore.any? { |k| k.token_valid? token }
     end
     
+    def token_signer token
+      each do |id, key|
+        return id if key.token_valid? token
+      end
+      return nil
+    end
+    
     attr_accessor :adapter
     
     private
