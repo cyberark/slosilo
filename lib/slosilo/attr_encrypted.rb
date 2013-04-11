@@ -56,4 +56,4 @@ module Slosilo
   end
 end
 
-Object.send:include, Slosilo::EncryptedAttributes
+Object.send :include, Slosilo::EncryptedAttributes
