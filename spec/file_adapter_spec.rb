@@ -19,16 +19,24 @@ describe Slosilo::Adapters::FileAdapter do
   end
   
   describe "#put_key" do
-    let(:id) { "id" }
     let(:key) { "key" }
-    let(:key_encrypted) { "encrypted key" }
-    let(:fname) { "#{dir}/#{id}.key" }
-    it "creates the key" do
-      Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key).and_return key_encrypted
-      File.should_receive(:write).with(fname, key_encrypted)
-      File.should_receive(:chmod).with(0400, fname)
-      subject.put_key id, key
-      subject.instance_variable_get("@keys")[id].should == key
+    context "unacceptable id" do
+      let(:id) { "foo.bar" }
+      it "isn't accepted" do
+        lambda { subject.put_key id, key }.should raise_error
+      end    
+    end
+    context "acceptable id" do
+      let(:id) { "id" }
+      let(:key_encrypted) { "encrypted key" }
+      let(:fname) { "#{dir}/#{id}.key" }
+      it "creates the key" do
+        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key).and_return key_encrypted
+        File.should_receive(:write).with(fname, key_encrypted)
+        File.should_receive(:chmod).with(0400, fname)
+        subject.put_key id, key
+        subject.instance_variable_get("@keys")[id].should == key
+      end    
     end
   end
   
