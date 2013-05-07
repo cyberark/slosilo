@@ -27,10 +27,20 @@ module Slosilo
       key = @key.public_encrypt key
       [ctxt, key]
     end
+
+    def encrypt_message plaintext
+      c, k = encrypt plaintext
+      k + c
+    end
     
     def decrypt ciphertext, skey
       key = @key.private_decrypt skey
       cipher.decrypt ciphertext, key: key
+    end
+
+    def decrypt_message ciphertext
+      k, c = ciphertext.unpack("A256A*")
+      decrypt c, k
     end
     
     def to_s
