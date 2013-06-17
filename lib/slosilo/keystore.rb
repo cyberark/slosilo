@@ -7,16 +7,20 @@ module Slosilo
     end
     
     def put id, key
-      adapter.put_key id.to_s, key.to_der
+      adapter.put_key id.to_s, key
     end
     
-    def get id
-      key = adapter.get_key(id.to_s)
-      key && Key.new(key)
+    def get id = nil, fingerprint: nil
+      if id
+        key = adapter.get_key(id.to_s)
+      elsif fingerprint
+        key = adapter.get_by_fingerprint(fingerprint)
+      end
+      key
     end
     
     def each &_
-      adapter.each { |k, v| yield k, Key.new(v) }
+      adapter.each { |k, v| yield k, v }
     end
     
     def any? &block

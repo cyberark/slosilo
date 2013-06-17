@@ -2,12 +2,16 @@ require 'spec_helper'
 
 describe Slosilo do
   include_context "with mock adapter"
-  let(:key) { OpenSSL::PKey::RSA.new 512 }
-  before { adapter['test'] = key.to_der }
+  include_context "with example key"
+  before { Slosilo['test'] = key }
   
   describe '[]' do
     it "returns a Slosilo::Key" do
       Slosilo[:test].should be_instance_of Slosilo::Key
+    end
+
+    it "allows looking up by fingerprint" do
+      Slosilo[fingerprint: key_fingerprint].should == key
     end
     
     context "when the requested key does not exist" do
@@ -49,7 +53,7 @@ describe Slosilo do
       let(:invalid_key) { double token_valid?: true }
       before do
         Slosilo::Key.stub new: invalid_key
-        Slosilo::Key.stub(:new).with(key2).and_return(valid_key)
+        adapter[:key2] = valid_key
       end
       
       it { should be_true }

@@ -50,6 +50,7 @@ describe Slosilo::Adapters::FileAdapter do
   end
   
   describe 'key store' do
+    include_context "with example key"
     let(:id) { 'some id' }
 
     before do
