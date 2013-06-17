@@ -1,12 +1,12 @@
 require 'spec_helper'
+require 'tmpdir'
 
 require 'slosilo/adapters/file_adapter'
 
 describe Slosilo::Adapters::FileAdapter do
-  let(:dir) {
-    require 'tmpdir' 
-    Dir.mktmpdir 
-  }
+  include_context "with example key"
+
+  let(:dir) { Dir.mktmpdir }
   let(:adapter) { Slosilo::Adapters::FileAdapter.new dir }
   subject { adapter }
   
@@ -19,7 +19,6 @@ describe Slosilo::Adapters::FileAdapter do
   end
   
   describe "#put_key" do
-    let(:key) { "key" }
     context "unacceptable id" do
       let(:id) { "foo.bar" }
       it "isn't accepted" do
@@ -31,7 +30,7 @@ describe Slosilo::Adapters::FileAdapter do
       let(:key_encrypted) { "encrypted key" }
       let(:fname) { "#{dir}/#{id}.key" }
       it "creates the key" do
-        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key).and_return key_encrypted
+        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key.to_der).and_return key_encrypted
         File.should_receive(:write).with(fname, key_encrypted)
         File.should_receive(:chmod).with(0400, fname)
         subject.put_key id, key
@@ -51,7 +50,6 @@ describe Slosilo::Adapters::FileAdapter do
   end
   
   describe 'key store' do
-    let(:key) { 'fake key' }
     let(:id) { 'some id' }
 
     before do

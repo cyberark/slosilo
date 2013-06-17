@@ -3,6 +3,8 @@ require 'spec_helper'
 require 'slosilo/adapters/sequel_adapter'
 
 describe Slosilo::Adapters::SequelAdapter do
+  include_context "with example key"
+
   let(:model) { double "model" }
   before { subject.stub create_model: model }
   
@@ -13,13 +15,20 @@ describe Slosilo::Adapters::SequelAdapter do
         subject.get_key(:whatever).should_not be
       end
     end
+
+    context "when it exists" do
+      let(:id) { "id" }
+      before { model.stub(:[]).with(id).and_return (double "key entry", id: id, key: rsa.to_der) }
+      it "returns it" do
+        subject.get_key(id).should == key
+      end
+    end
   end
   
   describe "#put_key" do
     let(:id) { "id" }
-    let(:key) { "key" }
     it "creates the key" do
-      model.should_receive(:create).with id: id, key: key
+      model.should_receive(:create).with id: id, key: key.to_der
       subject.put_key id, key
     end
   end
@@ -32,6 +41,7 @@ describe Slosilo::Adapters::SequelAdapter do
     
     it "iterates over each key" do
       results = []
+      Slosilo::Key.stub(:new) {|x|x}
       adapter.each { |id,k| results << { id => k } }
       results.should == [ { one: :onek}, {two: :twok } ]
     end

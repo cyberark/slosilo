@@ -15,18 +15,18 @@ module Slosilo
       end
       
       def put_key id, value
-        model.create id: id, key: value
+        model.create id: id, key: value.to_der
       end
       
       def get_key id
         stored = model[id]
         return nil unless stored
-        stored.key
+        Slosilo::Key.new stored.key
       end
       
       def each
         model.each do |m|
-          yield m.id, m.key
+          yield m.id, Slosilo::Key.new(m.key)
         end
       end
     end
