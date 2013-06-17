@@ -48,7 +48,7 @@ module Slosilo
     end
     
     def to_der
-      @key.to_der
+      @to_der ||= @key.to_der
     end
     
     def sign value
@@ -87,6 +87,16 @@ module Slosilo
     
     def fingerprint
       OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+    end
+
+    def == other
+      key.to_der == other.key.to_der
+    end
+
+    alias_method :eql?, :==
+
+    def hash
+      key.to_der.hash
     end
     
     private
