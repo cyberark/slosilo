@@ -48,9 +48,8 @@ describe Slosilo::Adapters::FileAdapter do
       results.should == [ { one: :onek}, {two: :twok } ]
     end
   end
-  
-  describe 'key store' do
-    include_context "with example key"
+
+  context 'with real key store' do
     let(:id) { 'some id' }
 
     before do
@@ -58,19 +57,25 @@ describe Slosilo::Adapters::FileAdapter do
       pre_adapter = Slosilo::Adapters::FileAdapter.new dir
       pre_adapter.put_key(id, key)
     end
-      
-    it "loads and decrypts the key" do
-      adapter.get_key(id).should == key
+
+    describe '#get_key' do
+      it "loads and decrypts the key" do
+        adapter.get_key(id).should == key
+      end
     end
 
-    it "can look up a key by a fingerprint" do
-      adapter.get_by_fingerprint(key_fingerprint).should == key
+    describe '#get_by_fingerprint' do
+      it "can look up a key by a fingerprint" do
+        adapter.get_by_fingerprint(key_fingerprint).should == key
+      end
     end
     
-    it "enumerates the keys" do
-      results = []
-      adapter.each { |id,k| results << { id => k } }
-      results.should == [ { id => key } ]
+    describe '#each' do
+      it "enumerates the keys" do
+        results = []
+        adapter.each { |id,k| results << { id => k } }
+        results.should == [ { id => key } ]
+      end
     end
   end
 end
