@@ -86,17 +86,17 @@ module Slosilo
     end
     
     def fingerprint
-      OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+      @fingerprint ||= OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
     end
 
     def == other
-      key.to_der == other.key.to_der
+      to_der == other.to_der
     end
 
     alias_method :eql?, :==
 
     def hash
-      key.to_der.hash
+      to_der.hash
     end
     
     private
