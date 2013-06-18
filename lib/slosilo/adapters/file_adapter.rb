@@ -8,9 +8,11 @@ module Slosilo
       def initialize(dir)
         @dir = dir
         @keys = {}
+        @fingerprints = {}
         Dir[File.join(@dir, "*.key")].each do |f|
           key = Slosilo::EncryptedAttributes.decrypt File.read(f)
-          @keys[File.basename(f, '.key')] = Slosilo::Key.new(key)
+          key = @keys[File.basename(f, '.key')] = Slosilo::Key.new(key)
+          @fingerprints[key.fingerprint] = key
         end
       end
       
@@ -24,6 +26,10 @@ module Slosilo
       
       def get_key id
         @keys[id]
+      end
+
+      def get_by_fingerprint fp
+        @fingerprints[fp]
       end
       
       def each(&block)

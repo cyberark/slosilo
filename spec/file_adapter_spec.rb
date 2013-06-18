@@ -62,6 +62,11 @@ describe Slosilo::Adapters::FileAdapter do
     it "loads and decrypts the key" do
       adapter.get_key(id).should == key
     end
+
+    it "can look up a key by a fingerprint" do
+      adapter.get_by_fingerprint(key_fingerprint).should == key
+    end
+    
     it "enumerates the keys" do
       results = []
       adapter.each { |id,k| results << { id => k } }
