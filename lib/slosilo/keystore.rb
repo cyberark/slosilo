@@ -10,7 +10,8 @@ module Slosilo
       adapter.put_key id.to_s, key
     end
     
-    def get id = nil, fingerprint: nil
+    def get opts
+      id, fingerprint = opts.is_a?(Hash) ? [nil, opts[:fingerprint]] : [opts, nil]
       if id
         key = adapter.get_key(id.to_s)
       elsif fingerprint
