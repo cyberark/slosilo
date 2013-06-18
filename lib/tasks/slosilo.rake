@@ -19,4 +19,9 @@ namespace :slosilo do
     Slosilo[args[:name]] = key
     puts key
   end
+
+  desc "Migrate to a new database schema"
+  task :migrate, :environment do |t|
+    Slosilo.keystore.migrate!
+  end
 end

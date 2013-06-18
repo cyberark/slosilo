@@ -15,7 +15,9 @@ module Slosilo
       end
       
       def put_key id, value
-        model.create id: id, key: value.to_der
+        attrs = { id: id, key: value.to_der }
+        attrs[:fingerprint] = value.fingerprint if fingerprint_in_db?
+        model.create attrs
       end
       
       def get_key id
@@ -23,10 +25,55 @@ module Slosilo
         return nil unless stored
         Slosilo::Key.new stored.key
       end
-      
+
+      def get_by_fingerprint fp
+        if fingerprint_in_db?
+          stored = model[fingerprint: fp]
+          return nil unless stored
+          Slosilo::Key.new stored.key
+        else
+          warn "Please migrate to a new database schema using rake slosilo:migrate for efficient fingerprint lookups"
+          find_by_fingerprint fp
+        end
+      end
+
       def each
         model.each do |m|
           yield m.id, Slosilo::Key.new(m.key)
+        end
+      end
+
+      def migrate!
+        unless fingerprint_in_db?
+          model.db.transaction do
+            model.db.alter_table :slosilo_keystore do
+              add_column :fingerprint, String
+            end
+
+            # reload the schema
+            model.set_dataset model.dataset
+
+            model.each do |m|
+              m.update fingerprint: Slosilo::Key.new(m.key).fingerprint
+            end
+
+            model.db.alter_table :slosilo_keystore do
+              set_column_not_null :fingerprint
+              add_unique_constraint :fingerprint
+            end
+          end
+        end
+      end
+
+      private
+
+      def fingerprint_in_db?
+        model.columns.include? :fingerprint
+      end
+
+      def find_by_fingerprint fp
+        each do |id, k|
+          return k if k.fingerprint == fp
         end
       end
     end
