@@ -7,6 +7,10 @@ module Slosilo
         raise NotImplementedError
       end
       
+      def get_by_fingerprint fp
+        raise NotImplementedError
+      end
+
       def put_key id, key
         raise NotImplementedError
       end

@@ -20,8 +20,8 @@ module Slosilo
       # and we can't use table_exists? because it rolls back
       create_table? keystore_table do
         String :id, primary_key: true
-        # Note: currently only postgres is supported
         bytea :key, null: false
+        String :fingerprint, unique: true, null: false
       end
     end
     
