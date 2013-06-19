@@ -63,7 +63,7 @@ describe Slosilo do
   describe '.token_signer' do
 
     context "when token matches a key" do
-      let(:token) {{ data: 'foo', key: key.fingerprint, signature: 'XXX' }}
+      let(:token) {{ 'data' => 'foo', 'key' => key.fingerprint, 'signature' => 'XXX' }}
 
       context "and the signature is valid" do
         before { key.stub(:token_valid?).with(token).and_return true }

@@ -6,14 +6,15 @@ module Slosilo
       end
 
       def put_key id, key
-        @fp[key.fingerprint] = key
+        @fp[key.fingerprint] = id
         self[id] = key
       end
 
       alias :get_key :[]
 
       def get_by_fingerprint fp
-        @fp[fp]
+        id = @fp[fp]
+        [self[id], id]
       end
     end
   end

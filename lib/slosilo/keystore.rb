@@ -15,9 +15,13 @@ module Slosilo
       if id
         key = adapter.get_key(id.to_s)
       elsif fingerprint
-        key = adapter.get_by_fingerprint(fingerprint)
+        key, _ = get_by_fingerprint(fingerprint)
       end
       key
+    end
+
+    def get_by_fingerprint fingerprint
+      adapter.get_by_fingerprint fingerprint
     end
     
     def each &_
@@ -54,10 +58,12 @@ module Slosilo
     end
     
     def token_signer token
-      each do |id, key|
-        return id if key.token_valid? token
+      key, id = keystore.get_by_fingerprint token['key']
+      if key && key.token_valid?(token)
+        return id
+      else
+        return nil
       end
-      return nil
     end
     
     attr_accessor :adapter

@@ -66,7 +66,7 @@ describe Slosilo::Adapters::FileAdapter do
 
     describe '#get_by_fingerprint' do
       it "can look up a key by a fingerprint" do
-        adapter.get_by_fingerprint(key_fingerprint).should == key
+        adapter.get_by_fingerprint(key_fingerprint).should == [key, id]
       end
     end
     

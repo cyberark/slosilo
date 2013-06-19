@@ -30,7 +30,7 @@ module Slosilo
         if fingerprint_in_db?
           stored = model[fingerprint: fp]
           return nil unless stored
-          Slosilo::Key.new stored.key
+          [Slosilo::Key.new(stored.key), stored.id]
         else
           warn "Please migrate to a new database schema using rake slosilo:migrate for efficient fingerprint lookups"
           find_by_fingerprint fp
@@ -73,7 +73,7 @@ module Slosilo
 
       def find_by_fingerprint fp
         each do |id, k|
-          return k if k.fingerprint == fp
+          return [k, id] if k.fingerprint == fp
         end
       end
     end

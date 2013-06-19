@@ -83,7 +83,7 @@ describe Slosilo::Adapters::SequelAdapter do
 
         it "supports look up by fingerprint, without a warning" do
           STDERR.grab do
-            subject.get_by_fingerprint(key.fingerprint).should == key
+            subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
           end.should be_empty
         end
       end
@@ -94,7 +94,7 @@ describe Slosilo::Adapters::SequelAdapter do
 
       it "supports look up by fingerprint, but issues a warning" do
         STDERR.grab do
-          subject.get_by_fingerprint(key.fingerprint).should == key
+          subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
         end.should_not be_empty
       end
     end
@@ -113,7 +113,7 @@ describe Slosilo::Adapters::SequelAdapter do
       end
 
       it "supports look up by fingerprint" do
-        subject.get_by_fingerprint(key.fingerprint).should == key
+        subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
       end
     end
   end
