@@ -48,7 +48,7 @@ module Slosilo
     end
     
     def to_der
-      @key.to_der
+      @to_der ||= @key.to_der
     end
     
     def sign value
@@ -74,9 +74,9 @@ module Slosilo
     
     def token_valid? token, expiry = 8 * 60
       token = token.clone
-      signature = Base64::urlsafe_decode64(token.delete "signature")
       expected_key = token.delete "key"
-      return false if expected_key and expected_key != fingerprint
+      return false if (expected_key and (expected_key != fingerprint))
+      signature = Base64::urlsafe_decode64(token.delete "signature")
       (Time.parse(token["timestamp"]) + expiry > Time.now) && verify_signature(token, signature)
     end
     
@@ -86,7 +86,17 @@ module Slosilo
     end
     
     def fingerprint
-      OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+      @fingerprint ||= OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+    end
+
+    def == other
+      to_der == other.to_der
+    end
+
+    alias_method :eql?, :==
+
+    def hash
+      to_der.hash
     end
     
     private

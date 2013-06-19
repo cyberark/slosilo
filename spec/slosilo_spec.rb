@@ -2,12 +2,16 @@ require 'spec_helper'
 
 describe Slosilo do
   include_context "with mock adapter"
-  let(:key) { OpenSSL::PKey::RSA.new 512 }
-  before { adapter['test'] = key.to_der }
+  include_context "with example key"
+  before { Slosilo['test'] = key }
   
   describe '[]' do
     it "returns a Slosilo::Key" do
       Slosilo[:test].should be_instance_of Slosilo::Key
+    end
+
+    it "allows looking up by fingerprint" do
+      Slosilo[fingerprint: key_fingerprint].should == key
     end
     
     context "when the requested key does not exist" do
@@ -49,7 +53,7 @@ describe Slosilo do
       let(:invalid_key) { double token_valid?: true }
       before do
         Slosilo::Key.stub new: invalid_key
-        Slosilo::Key.stub(:new).with(key2).and_return(valid_key)
+        adapter[:key2] = valid_key
       end
       
       it { should be_true }
@@ -57,21 +61,32 @@ describe Slosilo do
   end
   
   describe '.token_signer' do
-    let(:token) { double "token" }
-    let(:key_one) { double "key", token_valid?: false }
-    let(:other_key) { double "another key", token_valid?: false }
-    
-    before do
-      subject.stub(:each).and_yield('test', key_one).and_yield('other', other_key)
+
+    context "when token matches a key" do
+      let(:token) {{ 'data' => 'foo', 'key' => key.fingerprint, 'signature' => 'XXX' }}
+
+      context "and the signature is valid" do
+        before { key.stub(:token_valid?).with(token).and_return true }
+
+        it "returns the key id" do
+          subject.token_signer(token).should == 'test'
+        end
+      end
+
+      context "and the signature is invalid" do
+        before { key.stub(:token_valid?).with(token).and_return false }
+
+        it "returns nil" do
+          subject.token_signer(token).should_not be
+        end
+      end
     end
-    
-    it "returns nil when token doesn't have a valid signature from any known key" do
-      subject.token_signer(token).should_not be
-    end
-    
-    it "returns the name of the key which validates the token" do
-      other_key.stub(:token_valid?).with(token).and_return true
-      subject.token_signer(token).to_s.should == 'other'
+
+    context "when token doesn't match a key" do
+      let(:token) {{ 'data' => 'foo', 'key' => "footprint", 'signature' => 'XXX' }}
+      it "returns nil" do
+        subject.token_signer(token).should_not be
+      end
     end
   end
 end

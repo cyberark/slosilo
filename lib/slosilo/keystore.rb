@@ -7,16 +7,25 @@ module Slosilo
     end
     
     def put id, key
-      adapter.put_key id.to_s, key.to_der
+      adapter.put_key id.to_s, key
     end
     
-    def get id
-      key = adapter.get_key(id.to_s)
-      key && Key.new(key)
+    def get opts
+      id, fingerprint = opts.is_a?(Hash) ? [nil, opts[:fingerprint]] : [opts, nil]
+      if id
+        key = adapter.get_key(id.to_s)
+      elsif fingerprint
+        key, _ = get_by_fingerprint(fingerprint)
+      end
+      key
+    end
+
+    def get_by_fingerprint fingerprint
+      adapter.get_by_fingerprint fingerprint
     end
     
     def each &_
-      adapter.each { |k, v| yield k, Key.new(v) }
+      adapter.each { |k, v| yield k, v }
     end
     
     def any? &block
@@ -49,10 +58,12 @@ module Slosilo
     end
     
     def token_signer token
-      each do |id, key|
-        return id if key.token_valid? token
+      key, id = keystore.get_by_fingerprint token['key']
+      if key && key.token_valid?(token)
+        return id
+      else
+        return nil
       end
-      return nil
     end
     
     attr_accessor :adapter

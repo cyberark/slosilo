@@ -1,12 +1,12 @@
 require 'spec_helper'
+require 'tmpdir'
 
 require 'slosilo/adapters/file_adapter'
 
 describe Slosilo::Adapters::FileAdapter do
-  let(:dir) {
-    require 'tmpdir' 
-    Dir.mktmpdir 
-  }
+  include_context "with example key"
+
+  let(:dir) { Dir.mktmpdir }
   let(:adapter) { Slosilo::Adapters::FileAdapter.new dir }
   subject { adapter }
   
@@ -19,7 +19,6 @@ describe Slosilo::Adapters::FileAdapter do
   end
   
   describe "#put_key" do
-    let(:key) { "key" }
     context "unacceptable id" do
       let(:id) { "foo.bar" }
       it "isn't accepted" do
@@ -31,7 +30,7 @@ describe Slosilo::Adapters::FileAdapter do
       let(:key_encrypted) { "encrypted key" }
       let(:fname) { "#{dir}/#{id}.key" }
       it "creates the key" do
-        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key).and_return key_encrypted
+        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key.to_der).and_return key_encrypted
         File.should_receive(:write).with(fname, key_encrypted)
         File.should_receive(:chmod).with(0400, fname)
         subject.put_key id, key
@@ -49,9 +48,8 @@ describe Slosilo::Adapters::FileAdapter do
       results.should == [ { one: :onek}, {two: :twok } ]
     end
   end
-  
-  describe 'key store' do
-    let(:key) { 'fake key' }
+
+  context 'with real key store' do
     let(:id) { 'some id' }
 
     before do
@@ -59,14 +57,25 @@ describe Slosilo::Adapters::FileAdapter do
       pre_adapter = Slosilo::Adapters::FileAdapter.new dir
       pre_adapter.put_key(id, key)
     end
-      
-    it "loads and decrypts the key" do
-      adapter.get_key(id).should == key
+
+    describe '#get_key' do
+      it "loads and decrypts the key" do
+        adapter.get_key(id).should == key
+      end
     end
-    it "enumerates the keys" do
-      results = []
-      adapter.each { |id,k| results << { id => k } }
-      results.should == [ { id => key } ]
+
+    describe '#get_by_fingerprint' do
+      it "can look up a key by a fingerprint" do
+        adapter.get_by_fingerprint(key_fingerprint).should == [key, id]
+      end
+    end
+    
+    describe '#each' do
+      it "enumerates the keys" do
+        results = []
+        adapter.each { |id,k| results << { id => k } }
+        results.should == [ { id => key } ]
+      end
     end
   end
 end

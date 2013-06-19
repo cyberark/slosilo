@@ -7,7 +7,37 @@ describe Slosilo::Key do
   its(:to_der) { should == rsa.to_der }
   its(:to_s) { should == rsa.public_key.to_pem }
   its(:fingerprint) { should == key_fingerprint }
+
+  context "with identical key" do
+    let(:other) { Slosilo::Key.new rsa.to_der }
+    it "is equal" do
+      subject.should == other
+    end
+
+    it "is eql?" do
+      subject.eql?(other).should be_true
+    end
+
+    it "has equal hash" do
+      subject.hash.should == other.hash
+    end
+  end
   
+  context "with a different key" do
+    let(:other) { Slosilo::Key.new another_rsa }
+    it "is not equal" do
+      subject.should_not == other
+    end
+
+    it "is not eql?" do
+      subject.eql?(other).should_not be_true
+    end
+
+    it "has different hash" do
+      subject.hash.should_not == other.hash
+    end
+  end
+
   let(:plaintext) { 'quick brown fox jumped over the lazy dog' }
   describe '#encrypt' do
     it "generates a symmetric encryption key and encrypts the plaintext with the public key" do
