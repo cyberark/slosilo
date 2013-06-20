@@ -21,7 +21,7 @@ namespace :slosilo do
   end
 
   desc "Migrate to a new database schema"
-  task :migrate, :environment do |t|
-    Slosilo.keystore.migrate!
+  task :migrate => :environment do |t|
+    Slosilo.adapter.migrate!
   end
 end
