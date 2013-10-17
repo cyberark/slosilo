@@ -61,7 +61,7 @@ describe Slosilo::Adapters::SequelAdapter do
     before do
       Slosilo::encryption_key = Slosilo::Symmetric.new.random_key
       subject.unstub :create_model
-      Sequel::Model.cache_anonymous_models = false
+      Sequel.cache_anonymous_models = false
       Sequel::Model.db = db
     end
 

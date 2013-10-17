@@ -20,7 +20,7 @@ describe Slosilo::HTTPRequest do
     let(:token) { { "data" => signed_data, "timestamp" => timestamp, "signature" => signature } }
     
     it "makes a token out of the data to sign and inserts headers" do
-      own_key.stub(:signed_token).with(signed_data).and_return token
+      own_key.stub(:signed_token).with(signed_data, expiration: false).and_return token
       subject.should_receive(:[]=).with 'Timestamp', timestamp
       subject.should_receive(:[]=).with 'X-Slosilo-Signature', signature
       subject.sign!
