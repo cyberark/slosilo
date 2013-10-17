@@ -93,3 +93,30 @@ end
 def rack_environment_with_input expected
   RackEnvironmentInputMatcher.new expected
 end
+
+class Object
+  def ergo
+    (block_given? && mapped = yield(self)) ? mapped : self
+  end
+end
+
+class Hash
+  def except *keys
+    dup.except! *keys
+  end
+  def except! *keys
+    tap{ keys.flatten.each{ |k| delete k } }
+  end
+  def compact
+    dup.compact!
+  end
+  def compact!
+    tap{ select!{|k,v| v} }
+  end
+end
+
+class NilClass
+  def ergo
+    nil
+  end
+end

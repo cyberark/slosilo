@@ -26,7 +26,11 @@ module Slosilo
     # Sign the request with :own key from Slosilo::Keystore. 
     # If calling this manually, make sure to encrypt before signing.
     def sign!
-      token = Slosilo[:own].signed_token signed_data
+      # Hmm, I'm not sure whether we should update this to include an expiration
+      # in a header, or just continue to leave out the expiration field.  Leaving it
+      # out requires fewer changes (to Slosilo::Rack::MiddleWare) so I'm going with 
+      # that for now.
+      token = Slosilo[:own].signed_token signed_data, expiration: false
       self['Timestamp'] = token["timestamp"]
       self['X-Slosilo-Signature'] = token["signature"]
     end

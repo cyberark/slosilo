@@ -117,28 +117,136 @@ describe Slosilo::Key do
   end
   
   describe "#signed_token" do
-    let(:time) { Time.new(2012,1,1,1,1,1,0) }
+    let(:time) { Time.new(2012,1,1,1,1,1,0).utc }
+    let(:expiration){ time + 8 * 60 }
+    let(:expiration_option){ nil }
     let(:data) { { "foo" => :bar } }
-    let(:token_to_sign) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC" } }
-    let(:signature) { "signature" }
-    let(:salt) { 'a pinch of salt' }
-    let(:expected_signature) { Base64::urlsafe_encode64 "\xB0\xCE{\x9FP\xEDV\x9C\xE7b\x8B[\xFAil\x87^\x96\x17Z\x97\x1D\xC2?B\x96\x9C\x8Ep-\xDF_\x8F\xC21\xD9^\xBC\n\x16\x04\x8DJ\xF6\xAF-\xEC\xAD\x03\xF9\xEE:\xDF\xB5\x8F\xF9\xF6\x81m\xAB\x9C\xAB1\x1E\x837\x8C\xFB\xA8P\xA8<\xEA\x1Dx\xCEd\xED\x84f\xA7\xB5t`\x96\xCC\x0F\xA9t\x8B\x9Fo\xBF\x92K\xFA\xFD\xC5?\x8F\xC68t\xBC\x9F\xDE\n$\xCA\xD2\x8F\x96\x0EtX2\x8Cl\x1E\x8Aa\r\x8D\xCAi\x86\x1A\xBD\x1D\xF7\xBC\x8561j\x91YlO\xFA(\x98\x10iq\xCC\xAF\x9BV\xC6\v\xBC\x10Xm\xCD\xFE\xAD=\xAA\x95,\xB4\xF7\xE8W\xB8\x83;\x81\x88\xE6\x01\xBA\xA5F\x91\x17\f\xCE\x80\x8E\v\x83\x9D<\x0E\x83\xF6\x8D\x03\xC0\xE8A\xD7\x90i\x1D\x030VA\x906D\x10\xA0\xDE\x12\xEF\x06M\xD8\x8B\xA9W\xC8\x9DTc\x8AJ\xA4\xC0\xD3!\xFA\x14\x89\xD1p\xB4J7\xA5\x04\xC2l\xDC8<\x04Y\xD8\xA4\xFB[\x89\xB1\xEC\xDA\xB8\xD7\xEA\x03Ja pinch of salt".force_encoding("ASCII-8BIT") }
-    let(:expected_token) { token_to_sign.merge "signature" => expected_signature, "key" => key_fingerprint }
+    let(:token_to_sign) { { "data" => data, "timestamp" => time.to_s, "expiration" => expiration.ergo(&:to_s) }.compact }
+    let(:signature){ "signature" }
+    let(:expected_signature) { Base64::urlsafe_encode64 signature }
+    let(:expected_token){ token_to_sign.merge "signature" => expected_signature, "key" => key_fingerprint }
+    
     before do
-      key.stub salt: salt
-      Time.stub new: time
+      key.should_receive(:sign).with(token_to_sign).and_return signature
+      key.stub current_time: time
     end
-    subject { key.signed_token data }
+    
+    subject { key.signed_token data, expiration: expiration_option }
     it { should == expected_token }
+    
+    context "when given an expiration option" do
+      context "as a Time" do
+        let(:expiration){ time + 2 * 60 }
+        let(:expiration_option){ expiration }
+        it { should == expected_token }
+      end
+      context "as a duration in seconds" do
+        let(:expiration_option){ 18 * 60 }
+        let(:expiration){ time + expiration_option }
+        it{ should == expected_token }
+      end
+      context "when false" do
+        let(:expiration_option){ false }
+        let(:expiration){ nil }
+        it{ should == expected_token }
+        it "does not include an expiration field" do
+          subject.should_not include "expiration"
+        end
+      end
+    end
+  end
+  
+  describe "#token_expired?" do
+    let(:now){ Time.new(2013,1,1,1,1,1,0).utc }
+    let(:expiry_arg){ nil }
+    let(:expiration){ nil }
+    let(:timestamp){ nil }
+    let(:token){ Hash[{"timestamp" => timestamp,
+                  "expiration" => expiration}.reject{|k,v| v.nil?}.map{|k,v| [k,v.utc.to_s]}] }
+    
+    before do
+      key.stub current_time: now
+    end
+    
+    subject{ key.token_expired? *[token, expiry_arg].compact }
+    
+    context "when token contains an expiration field" do
+      context "of 6 minutes ago" do
+        let(:expiration){ now - 6 * 60 }
+        it{ should be_true }
+        context "when an expiry is given" do
+          let(:expiry_arg){ 200 * 60 }
+          it("it is ignored"){ should be_true }
+        end
+      end
+      context "of 1 minute from now" do
+        let(:expiration){ now + 60 }
+        it{ should be_false }
+        context "when an expiry arg is given" do
+          let(:expiry_arg){ 10 }
+          it("is ignored"){ should be_false }
+        end
+      end
+    end
+    
+    context "when token does not contain an expiration" do
+      context "when timestamp is 3 minutes ago" do
+        let(:timestamp){ now - 180 }
+        it{ should be_false }
+        context "when expiry arg is 10 seconds" do
+          let(:expiry_arg){ 10 }
+          it{ should be_true }
+        end
+        context "when expiry arg is 4 minutes" do
+          let(:expiry_arg){ 240 }
+          it{ should be_false }
+        end
+      end
+      
+      context "when timestamp is 10 minutes ago" do
+        let(:timestamp){ now - 600 }
+        it{ should be_true }
+        context "when expiry arg is 15 minutes" do
+          let(:expiry_arg){ 15 * 60 }
+          it{ should be_false }
+        end
+      end
+      
+    end
   end
   
   describe "#token_valid?" do
     let(:data) { { "foo" => :bar } }
-    let(:signature) { Base64::urlsafe_encode64 "\xB0\xCE{\x9FP\xEDV\x9C\xE7b\x8B[\xFAil\x87^\x96\x17Z\x97\x1D\xC2?B\x96\x9C\x8Ep-\xDF_\x8F\xC21\xD9^\xBC\n\x16\x04\x8DJ\xF6\xAF-\xEC\xAD\x03\xF9\xEE:\xDF\xB5\x8F\xF9\xF6\x81m\xAB\x9C\xAB1\x1E\x837\x8C\xFB\xA8P\xA8<\xEA\x1Dx\xCEd\xED\x84f\xA7\xB5t`\x96\xCC\x0F\xA9t\x8B\x9Fo\xBF\x92K\xFA\xFD\xC5?\x8F\xC68t\xBC\x9F\xDE\n$\xCA\xD2\x8F\x96\x0EtX2\x8Cl\x1E\x8Aa\r\x8D\xCAi\x86\x1A\xBD\x1D\xF7\xBC\x8561j\x91YlO\xFA(\x98\x10iq\xCC\xAF\x9BV\xC6\v\xBC\x10Xm\xCD\xFE\xAD=\xAA\x95,\xB4\xF7\xE8W\xB8\x83;\x81\x88\xE6\x01\xBA\xA5F\x91\x17\f\xCE\x80\x8E\v\x83\x9D<\x0E\x83\xF6\x8D\x03\xC0\xE8A\xD7\x90i\x1D\x030VA\x906D\x10\xA0\xDE\x12\xEF\x06M\xD8\x8B\xA9W\xC8\x9DTc\x8AJ\xA4\xC0\xD3!\xFA\x14\x89\xD1p\xB4J7\xA5\x04\xC2l\xDC8<\x04Y\xD8\xA4\xFB[\x89\xB1\xEC\xDA\xB8\xD7\xEA\x03Ja pinch of salt".force_encoding("ASCII-8BIT") }
-    let(:token) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC", "signature" => signature } }
-    before { Time.stub now: Time.new(2012,1,1,1,2,1,0) }
+    let(:now){ Time.new(2013,1,1,1,1,1,0).utc }
+    let(:timestamp){ now }
+    let(:expiration){ timestamp.ergo{ |t| t + 8 * 60 } }
+    let(:unsigned_token){ { "data" => data, "timestamp" => timestamp.ergo(&:to_s), "expiration" => expiration.ergo(&:to_s) }.compact }
+    let(:raw_signature){ key.sign unsigned_token }
+    let(:signature){ Base64.urlsafe_encode64(raw_signature) }
+    let(:token){ unsigned_token.merge "signature" => signature }
+    
+    before { 
+      key.stub current_time: now
+    }
+    
     subject { key.token_valid? token }
     it { should be_true }
+    
+    it "calls #token_expired? with the token and expiry" do
+      key.should_receive(:token_expired?).with(unsigned_token, kind_of(Numeric)).and_return false, true
+      key.token_valid?(token).should be_true
+      key.token_valid?(token).should be_false
+    end
+    
+    context "when #token_expired? returns false" do
+      before{ key.stub(:token_expired?).with(unsigned_token, kind_of(Numeric)).and_return false }
+      it{ should be_true }
+    end
+    
+    context "when #token_expired? returns true" do
+      before{ key.stub(:token_expired?).with(unsigned_token, kind_of(Numeric)).and_return true }
+      it{ should be_false }
+    end
     
     it "doesn't check signature on the advisory key field" do
       key.token_valid?(token.merge "key" => key_fingerprint).should be_true
@@ -148,17 +256,44 @@ describe Slosilo::Key do
       key.token_valid?(token.merge "key" => "this is not the key you are looking for").should_not be_true
     end
     
-    context "when token is 1 hour old" do
-      before { Time.stub now: Time.new(2012,1,1,2,1,1,0) }
-      it { should be_false }
-      context "when timestamp in the token is changed accordingly" do
-        let(:token) { { "data" => data, "timestamp" => "2012-01-01 02:00:01 UTC", "signature" => signature } }
-        it { should be_false }
+    context "when token is 5 minutes old" do
+      before{ key.stub current_time: now + 60 * 5 }
+      it{should be_true }
+      context "when the token expiration is 3 minutes from now" do
+        let(:expiration){ now + 3 * 60 }
+        it{ should be_false }
       end
     end
-    context "when the data is changed" do
-      let(:data) { { "foo" => :baz } }
+    
+    context "when token is 1 hour old" do
+      let(:later){ now + 60 * 60 }
+      before { key.stub current_time: later }
       it { should be_false }
+      context "when timestamp in the token is changed accordingly" do
+        let(:messed_with_token) { token.merge("timestamp" => later.to_s) }
+        it "should not be valid" do 
+          key.token_valid?(messed_with_token).should be_false
+        end
+      end
+      context "when expiration in the token is changed accordingly" do
+        let(:messed_with_token){ token.merge("expiration" => (later + 120).to_s) }
+        it "should not be valid" do
+          key.token_valid?(messed_with_token).should be_false
+        end
+      end
+    end
+    
+    context "when expiration is not present" do
+      let(:expiration){ nil }
+      let(:timestamp){ now + 8 * 60 }
+      it{ should be_true }
+    end
+    
+    context "when the data is changed" do
+      let(:messed_with_token) { token.merge("data" => { "foo" => :baz }) }
+      it "is not valid" do
+        key.token_valid?(messed_with_token).should be_false
+      end
     end
     context "when RSA decrypt raises an error" do
       before { OpenSSL::PKey::RSA.any_instance.should_receive(:public_decrypt).and_raise(OpenSSL::PKey::RSAError) }
