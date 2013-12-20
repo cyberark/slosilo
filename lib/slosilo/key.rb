@@ -81,8 +81,8 @@ module Slosilo
     end
     
     def sign_string value
-      _salt = salt
-      key.private_encrypt(hash_function.digest(_salt + value)) + _salt
+      salt = self.salt
+      key.private_encrypt(hash_function.digest(salt + value)) + salt
     end
     
     def fingerprint
@@ -100,6 +100,8 @@ module Slosilo
     end
     
     private
+    # Note that this is currently somewhat shallow stringification -- 
+    # to implement originating tokens we may need to make it deeper.
     def stringify value
       case value
       when Hash
