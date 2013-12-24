@@ -81,7 +81,7 @@ module Slosilo
     end
     
     def sign_string value
-      salt = self.salt
+      salt = shake_salt
       key.private_encrypt(hash_function.digest(salt + value)) + salt
     end
     
@@ -100,6 +100,7 @@ module Slosilo
     end
     
     private
+    
     # Note that this is currently somewhat shallow stringification -- 
     # to implement originating tokens we may need to make it deeper.
     def stringify value
@@ -113,7 +114,7 @@ module Slosilo
       end
     end
     
-    def salt
+    def shake_salt
       Slosilo::Random::salt
     end
     
