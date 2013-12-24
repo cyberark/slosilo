@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{This gem provides an easy way of storing and retrieving encryption keys in the database.}
   gem.summary       = %q{Store SSL keys in a database}
   gem.homepage      = ""
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
