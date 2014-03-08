@@ -1,6 +1,10 @@
 require "simplecov"
 SimpleCov.start
 
+RSpec.configure do |c|
+  c.treat_symbols_as_metadata_keys_with_true_values = true
+end
+
 require 'slosilo'
 
 shared_context "with mock adapter" do
