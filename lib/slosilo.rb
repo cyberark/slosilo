@@ -5,6 +5,7 @@ require "slosilo/attr_encrypted"
 require "slosilo/random"
 require "slosilo/rack/middleware"
 require "slosilo/http_request"
+require "slosilo/errors"
 
 if defined? Sequel
   require 'slosilo/adapters/sequel_adapter'

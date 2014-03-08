@@ -103,6 +103,11 @@ module Slosilo
     def public
       Key.new(@key.public_key)
     end
+
+    # checks if the keypair contains a private key
+    def private?
+      @key.private?
+    end
     
     private
     

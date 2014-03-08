@@ -6,15 +6,21 @@ module Slosilo
       def model
         @model ||= create_model
       end
+
+      def secure?
+        !Slosilo.encryption_key.nil?
+      end
       
       def create_model
         model = Sequel::Model(:slosilo_keystore)
         model.unrestrict_primary_key
-        model.attr_encrypted :key
+        model.attr_encrypted :key if secure?
         model
       end
       
       def put_key id, value
+        fail Error::InsecureKeyStorage unless secure? || !value.private?
+
         attrs = { id: id, key: value.to_der }
         attrs[:fingerprint] = value.fingerprint if fingerprint_in_db?
         model.create attrs

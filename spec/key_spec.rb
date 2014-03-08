@@ -7,6 +7,7 @@ describe Slosilo::Key do
   its(:to_der) { should == rsa.to_der }
   its(:to_s) { should == rsa.public_key.to_pem }
   its(:fingerprint) { should == key_fingerprint }
+  it { should be_private }
 
   context "with identical key" do
     let(:other) { Slosilo::Key.new rsa.to_der }
@@ -42,6 +43,7 @@ describe Slosilo::Key do
     it "returns a key with just the public half" do
       pkey = subject.public
       expect(pkey).to be_a(Slosilo::Key)
+      expect(pkey).to_not be_private
       expect(pkey.key).to_not be_private
       expect(pkey.to_der).to eq(rsa.public_key.to_der)
     end

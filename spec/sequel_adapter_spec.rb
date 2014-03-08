@@ -118,13 +118,15 @@ describe Slosilo::Adapters::SequelAdapter do
       Sequel.extension :migration
       require 'slosilo/adapters/sequel_adapter/migration.rb'
       Sequel::Migration.descendants.first.apply db, :up
-      subject.put_key 'test', key
     end
   end
 
   context "with current schema" do
     include_context "encryption key"
     include_context "current schema"
+    before do
+      subject.put_key 'test', key
+    end
 
     it "supports look up by id" do
       subject.get_key("test").should == key
@@ -132,6 +134,42 @@ describe Slosilo::Adapters::SequelAdapter do
 
     it "supports look up by fingerprint" do
       subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
+    end
+  end
+
+  context "with an encryption key", :wip do
+    include_context "encryption key"
+    include_context "current schema"
+
+    it { should be_secure }
+
+    it "saves the keys in encrypted form" do
+      subject.put_key 'test', key
+
+      expect(db[:slosilo_keystore][id: 'test'][:key]).to_not eq(key.to_der)
+      expect(subject.get_key 'test').to eq(key)
+    end
+  end
+
+  context "without an encryption key", :wip do
+    before do
+      Slosilo.encryption_key = nil
+    end
+
+    include_context "current schema"
+
+    it { should_not be_secure }
+
+    it "refuses to store a private key" do
+      expect { subject.put_key 'test', key }.to raise_error(Slosilo::Error::InsecureKeyStorage)
+    end
+
+    it "saves the keys in plaintext form" do
+      pkey = key.public
+      subject.put_key 'test', pkey
+
+      expect(db[:slosilo_keystore][id: 'test'][:key]).to eq(pkey.to_der)
+      expect(subject.get_key 'test').to eq(pkey)
     end
   end
 end
