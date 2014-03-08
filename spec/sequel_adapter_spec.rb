@@ -56,10 +56,9 @@ describe Slosilo::Adapters::SequelAdapter do
     end
   end
 
-  context do
+  shared_context "database" do
     let(:db) { Sequel.sqlite }
     before do
-      Slosilo::encryption_key = Slosilo::Symmetric.new.random_key
       subject.unstub :create_model
       begin
         Sequel::Model.cache_anonymous_models = false
@@ -68,57 +67,71 @@ describe Slosilo::Adapters::SequelAdapter do
       end
       Sequel::Model.db = db
     end
+  end
 
-    context "with old schema" do
-      before do
-        db.create_table :slosilo_keystore do
-          String :id, primary_key: true
-          bytea :key, null: false
-        end
-        subject.put_key 'test', key
+  shared_context "encryption key" do
+    before do
+      Slosilo.encryption_key = Slosilo::Symmetric.new.random_key
+    end
+  end
+
+  context "with old schema" do
+    include_context "encryption key"
+    include_context "database"
+
+    before do
+      db.create_table :slosilo_keystore do
+        String :id, primary_key: true
+        bytea :key, null: false
       end
+      subject.put_key 'test', key
+    end
 
-      context "after migration" do
-        before { subject.migrate! }
-
-        it "supports look up by id" do
-          subject.get_key("test").should == key
-        end
-
-        it "supports look up by fingerprint, without a warning" do
-          STDERR.grab do
-            subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
-          end.should be_empty
-        end
-      end
+    context "after migration" do
+      before { subject.migrate! }
 
       it "supports look up by id" do
         subject.get_key("test").should == key
       end
 
-      it "supports look up by fingerprint, but issues a warning" do
+      it "supports look up by fingerprint, without a warning" do
         STDERR.grab do
           subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
-        end.should_not be_empty
+        end.should be_empty
       end
     end
 
-    context "with current schema" do
-      before do
-        Sequel.extension :migration
-        require 'slosilo/adapters/sequel_adapter/migration.rb'
-        Sequel::Migration::descendants.first.apply db, :up
-        subject.put_key 'test', key
-      end
+    it "supports look up by id" do
+      subject.get_key("test").should == key
+    end
 
-
-      it "supports look up by id" do
-        subject.get_key("test").should == key
-      end
-
-      it "supports look up by fingerprint" do
+    it "supports look up by fingerprint, but issues a warning" do
+      STDERR.grab do
         subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
-      end
+      end.should_not be_empty
+    end
+  end
+
+  shared_context "current schema" do
+    include_context "database"
+    before do
+      Sequel.extension :migration
+      require 'slosilo/adapters/sequel_adapter/migration.rb'
+      Sequel::Migration.descendants.first.apply db, :up
+      subject.put_key 'test', key
+    end
+  end
+
+  context "with current schema" do
+    include_context "encryption key"
+    include_context "current schema"
+
+    it "supports look up by id" do
+      subject.get_key("test").should == key
+    end
+
+    it "supports look up by fingerprint" do
+      subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
     end
   end
 end
