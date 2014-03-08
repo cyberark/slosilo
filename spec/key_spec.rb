@@ -38,6 +38,15 @@ describe Slosilo::Key do
     end
   end
 
+  describe '#public' do
+    it "returns a key with just the public half" do
+      pkey = subject.public
+      expect(pkey).to be_a(Slosilo::Key)
+      expect(pkey.key).to_not be_private
+      expect(pkey.to_der).to eq(rsa.public_key.to_der)
+    end
+  end
+
   let(:plaintext) { 'quick brown fox jumped over the lazy dog' }
   describe '#encrypt' do
     it "generates a symmetric encryption key and encrypts the plaintext with the public key" do

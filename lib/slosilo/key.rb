@@ -98,6 +98,11 @@ module Slosilo
     def hash
       to_der.hash
     end
+
+    # return a new key with just the public part of this
+    def public
+      Key.new(@key.public_key)
+    end
     
     private
     
