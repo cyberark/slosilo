@@ -7,7 +7,9 @@ module Slosilo
     end
     
     def put id, key
-      adapter.put_key id.to_s, key
+      id = id.to_s
+      fail ArgumentError, "id can't be empty" if id.empty?
+      adapter.put_key id, key
     end
     
     def get opts

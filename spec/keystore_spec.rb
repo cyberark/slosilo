@@ -10,6 +10,14 @@ describe Slosilo::Keystore do
       adapter['test'].to_der.should == rsa.to_der
     end
 
+    it "refuses to store a key with a nil id" do
+      expect { subject.put(nil, key) }.to raise_error(ArgumentError)
+    end
+
+    it "refuses to store a key with an empty id" do
+      expect { subject.put('', key) }.to raise_error(ArgumentError)
+    end
+
     it "passes the Slosilo key to the adapter" do
       adapter.should_receive(:put_key).with "test", key
       subject.put :test, key
