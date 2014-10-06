@@ -18,8 +18,8 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
   
   gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'ci_reporter'
+  gem.add_development_dependency 'rspec', '~> 2.14'
+  gem.add_development_dependency 'ci_reporter', '~> 1.9'
   gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'sequel' # for sequel tests
   gem.add_development_dependency 'sqlite3' # for sequel tests
