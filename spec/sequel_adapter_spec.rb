@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'sequel'
-require 'io_helper'
+require 'io/grab'
 
 require 'slosilo/adapters/sequel_adapter'
 
@@ -95,7 +95,7 @@ describe Slosilo::Adapters::SequelAdapter do
       end
 
       it "supports look up by fingerprint, without a warning" do
-        STDERR.grab do
+        $stderr.grab do
           subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
         end.should be_empty
       end
@@ -106,7 +106,7 @@ describe Slosilo::Adapters::SequelAdapter do
     end
 
     it "supports look up by fingerprint, but issues a warning" do
-      STDERR.grab do
+      $stderr.grab do
         subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
       end.should_not be_empty
     end

@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec', '~> 2.14'
   gem.add_development_dependency 'ci_reporter', '~> 1.9'
   gem.add_development_dependency 'simplecov'
+  gem.add_development_dependency 'io-grab', '~> 0.0.1'
   gem.add_development_dependency 'sequel' # for sequel tests
   gem.add_development_dependency 'sqlite3' # for sequel tests
 end
