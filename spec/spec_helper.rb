@@ -83,17 +83,3 @@ ooQ2FuL0K6ukQfHPjuMswqi41lmVH8gIVqVC+QnImUCrGxH9WXWy
     before { Slosilo.stub(:[]).with(:own).and_return key }
   end
 end
-
-class RackEnvironmentInputMatcher
-  def initialize expected
-    @expected = expected
-  end
-  
-  def == env
-    env['rack.input'].read.should == @expected
-  end
-end
-
-def rack_environment_with_input expected
-  RackEnvironmentInputMatcher.new expected
-end
