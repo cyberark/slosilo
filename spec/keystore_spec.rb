@@ -7,7 +7,7 @@ describe Slosilo::Keystore do
   describe '#put' do
     it "handles Slosilo::Keys" do
       subject.put(:test, key)
-      adapter['test'].to_der.should == rsa.to_der
+      expect(adapter['test'].to_der).to eq(rsa.to_der)
     end
 
     it "refuses to store a key with a nil id" do
@@ -19,7 +19,7 @@ describe Slosilo::Keystore do
     end
 
     it "passes the Slosilo key to the adapter" do
-      adapter.should_receive(:put_key).with "test", key
+      expect(adapter).to receive(:put_key).with "test", key
       subject.put :test, key
     end
   end

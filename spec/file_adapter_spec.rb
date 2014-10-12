@@ -13,7 +13,7 @@ describe Slosilo::Adapters::FileAdapter do
   describe "#get_key" do
     context "when given key does not exist" do
       it "returns nil" do
-        subject.get_key(:whatever).should_not be
+        expect(subject.get_key(:whatever)).not_to be
       end
     end
   end
@@ -22,7 +22,7 @@ describe Slosilo::Adapters::FileAdapter do
     context "unacceptable id" do
       let(:id) { "foo.bar" }
       it "isn't accepted" do
-        lambda { subject.put_key id, key }.should raise_error
+        expect { subject.put_key id, key }.to raise_error
       end    
     end
     context "acceptable id" do
@@ -30,11 +30,11 @@ describe Slosilo::Adapters::FileAdapter do
       let(:key_encrypted) { "encrypted key" }
       let(:fname) { "#{dir}/#{id}.key" }
       it "creates the key" do
-        Slosilo::EncryptedAttributes.should_receive(:encrypt).with(key.to_der).and_return key_encrypted
-        File.should_receive(:write).with(fname, key_encrypted)
-        File.should_receive(:chmod).with(0400, fname)
+        expect(Slosilo::EncryptedAttributes).to receive(:encrypt).with(key.to_der).and_return key_encrypted
+        expect(File).to receive(:write).with(fname, key_encrypted)
+        expect(File).to receive(:chmod).with(0400, fname)
         subject.put_key id, key
-        subject.instance_variable_get("@keys")[id].should == key
+        expect(subject.instance_variable_get("@keys")[id]).to eq(key)
       end    
     end
   end
@@ -45,7 +45,7 @@ describe Slosilo::Adapters::FileAdapter do
     it "iterates over each key" do
       results = []
       adapter.each { |id,k| results << { id => k } }
-      results.should == [ { one: :onek}, {two: :twok } ]
+      expect(results).to eq([ { one: :onek}, {two: :twok } ])
     end
   end
 
@@ -60,13 +60,13 @@ describe Slosilo::Adapters::FileAdapter do
 
     describe '#get_key' do
       it "loads and decrypts the key" do
-        adapter.get_key(id).should == key
+        expect(adapter.get_key(id)).to eq(key)
       end
     end
 
     describe '#get_by_fingerprint' do
       it "can look up a key by a fingerprint" do
-        adapter.get_by_fingerprint(key_fingerprint).should == [key, id]
+        expect(adapter.get_by_fingerprint(key_fingerprint)).to eq([key, id])
       end
     end
     
@@ -74,7 +74,7 @@ describe Slosilo::Adapters::FileAdapter do
       it "enumerates the keys" do
         results = []
         adapter.each { |id,k| results << { id => k } }
-        results.should == [ { id => key } ]
+        expect(results).to eq([ { id => key } ])
       end
     end
   end

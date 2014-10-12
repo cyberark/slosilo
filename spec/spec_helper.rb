@@ -80,6 +80,6 @@ ooQ2FuL0K6ukQfHPjuMswqi41lmVH8gIVqVC+QnImUCrGxH9WXWy
   end
   
   def self.mock_own_key
-    before { Slosilo.stub(:[]).with(:own).and_return key }
+    before { allow(Slosilo).to receive(:[]).with(:own).and_return key }
   end
 end

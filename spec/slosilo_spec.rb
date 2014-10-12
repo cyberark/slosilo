@@ -7,26 +7,26 @@ describe Slosilo do
   
   describe '[]' do
     it "returns a Slosilo::Key" do
-      Slosilo[:test].should be_instance_of Slosilo::Key
+      expect(Slosilo[:test]).to be_instance_of Slosilo::Key
     end
 
     it "allows looking up by fingerprint" do
-      Slosilo[fingerprint: key_fingerprint].should == key
+      expect(Slosilo[fingerprint: key_fingerprint]).to eq(key)
     end
     
     context "when the requested key does not exist" do
       it "returns nil instead of creating a new key" do
-        Slosilo[:aether].should_not be
+        expect(Slosilo[:aether]).not_to be
       end
     end
   end
   
   describe '.sign' do
     let(:own_key) { double "own key" }
-    before { Slosilo.stub(:[]).with(:own).and_return own_key }
+    before { allow(Slosilo).to receive(:[]).with(:own).and_return own_key }
     let (:argument) { double "thing to sign" }
     it "fetches the own key and signs using that" do
-      own_key.should_receive(:sign).with(argument)
+      expect(own_key).to receive(:sign).with(argument)
       Slosilo.sign argument
     end
   end
@@ -45,7 +45,7 @@ describe Slosilo do
     
     context "when no key validates the token" do
       before { Slosilo::Key.stub new: (double "key", token_valid?: false) }
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
     
     context "when a key validates the token" do
@@ -56,7 +56,7 @@ describe Slosilo do
         adapter[:key2] = valid_key
       end
       
-      it { should be_true }
+      it { is_expected.to be_truthy }
     end
   end
   
@@ -66,18 +66,18 @@ describe Slosilo do
       let(:token) {{ 'data' => 'foo', 'key' => key.fingerprint, 'signature' => 'XXX' }}
 
       context "and the signature is valid" do
-        before { key.stub(:token_valid?).with(token).and_return true }
+        before { allow(key).to receive(:token_valid?).with(token).and_return true }
 
         it "returns the key id" do
-          subject.token_signer(token).should == 'test'
+          expect(subject.token_signer(token)).to eq('test')
         end
       end
 
       context "and the signature is invalid" do
-        before { key.stub(:token_valid?).with(token).and_return false }
+        before { allow(key).to receive(:token_valid?).with(token).and_return false }
 
         it "returns nil" do
-          subject.token_signer(token).should_not be
+          expect(subject.token_signer(token)).not_to be
         end
       end
     end
@@ -85,7 +85,7 @@ describe Slosilo do
     context "when token doesn't match a key" do
       let(:token) {{ 'data' => 'foo', 'key' => "footprint", 'signature' => 'XXX' }}
       it "returns nil" do
-        subject.token_signer(token).should_not be
+        expect(subject.token_signer(token)).not_to be
       end
     end
   end

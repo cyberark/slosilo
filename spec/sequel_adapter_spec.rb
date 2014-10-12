@@ -14,15 +14,15 @@ describe Slosilo::Adapters::SequelAdapter do
     context "when given key does not exist" do
       before { model.stub :[] => nil }
       it "returns nil" do
-        subject.get_key(:whatever).should_not be
+        expect(subject.get_key(:whatever)).not_to be
       end
     end
 
     context "when it exists" do
       let(:id) { "id" }
-      before { model.stub(:[]).with(id).and_return (double "key entry", id: id, key: rsa.to_der) }
+      before { allow(model).to receive(:[]).with(id).and_return (double "key entry", id: id, key: rsa.to_der) }
       it "returns it" do
-        subject.get_key(id).should == key
+        expect(subject.get_key(id)).to eq(key)
       end
     end
   end
@@ -30,13 +30,13 @@ describe Slosilo::Adapters::SequelAdapter do
   describe "#put_key" do
     let(:id) { "id" }
     it "creates the key" do
-      model.should_receive(:create).with id: id, key: key.to_der
+      expect(model).to receive(:create).with id: id, key: key.to_der
       model.stub columns: [:id, :key]
       subject.put_key id, key
     end
 
     it "adds the fingerprint if feasible" do
-      model.should_receive(:create).with id: id, key: key.to_der, fingerprint: key.fingerprint
+      expect(model).to receive(:create).with id: id, key: key.to_der, fingerprint: key.fingerprint
       model.stub columns: [:id, :key, :fingerprint]
       subject.put_key id, key
     end
@@ -46,20 +46,20 @@ describe Slosilo::Adapters::SequelAdapter do
   describe "#each" do
     let(:one) { double("one", id: :one, key: :onek) }
     let(:two) { double("two", id: :two, key: :twok) }
-    before { model.stub(:each).and_yield(one).and_yield(two) }
+    before { allow(model).to receive(:each).and_yield(one).and_yield(two) }
     
     it "iterates over each key" do
       results = []
-      Slosilo::Key.stub(:new) {|x|x}
+      allow(Slosilo::Key).to receive(:new) {|x|x}
       adapter.each { |id,k| results << { id => k } }
-      results.should == [ { one: :onek}, {two: :twok } ]
+      expect(results).to eq([ { one: :onek}, {two: :twok } ])
     end
   end
 
   shared_context "database" do
     let(:db) { Sequel.sqlite }
     before do
-      subject.unstub :create_model
+      allow(subject).to receive(:create_model).and_call_original
       begin
         Sequel::Model.cache_anonymous_models = false
       rescue NoMethodError # sequel 4.0 moved the method
@@ -91,24 +91,24 @@ describe Slosilo::Adapters::SequelAdapter do
       before { subject.migrate! }
 
       it "supports look up by id" do
-        subject.get_key("test").should == key
+        expect(subject.get_key("test")).to eq(key)
       end
 
       it "supports look up by fingerprint, without a warning" do
-        $stderr.grab do
-          subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
-        end.should be_empty
+        expect($stderr.grab do
+          expect(subject.get_by_fingerprint(key.fingerprint)).to eq([key, 'test'])
+        end).to be_empty
       end
     end
 
     it "supports look up by id" do
-      subject.get_key("test").should == key
+      expect(subject.get_key("test")).to eq(key)
     end
 
     it "supports look up by fingerprint, but issues a warning" do
-      $stderr.grab do
-        subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
-      end.should_not be_empty
+      expect($stderr.grab do
+        expect(subject.get_by_fingerprint(key.fingerprint)).to eq([key, 'test'])
+      end).not_to be_empty
     end
   end
 
@@ -129,11 +129,11 @@ describe Slosilo::Adapters::SequelAdapter do
     end
 
     it "supports look up by id" do
-      subject.get_key("test").should == key
+      expect(subject.get_key("test")).to eq(key)
     end
 
     it "supports look up by fingerprint" do
-      subject.get_by_fingerprint(key.fingerprint).should == [key, 'test']
+      expect(subject.get_by_fingerprint(key.fingerprint)).to eq([key, 'test'])
     end
   end
 
@@ -141,7 +141,7 @@ describe Slosilo::Adapters::SequelAdapter do
     include_context "encryption key"
     include_context "current schema"
 
-    it { should be_secure }
+    it { is_expected.to be_secure }
 
     it "saves the keys in encrypted form" do
       subject.put_key 'test', key
@@ -158,7 +158,7 @@ describe Slosilo::Adapters::SequelAdapter do
 
     include_context "current schema"
 
-    it { should_not be_secure }
+    it { is_expected.not_to be_secure }
 
     it "refuses to store a private key" do
       expect { subject.put_key 'test', key }.to raise_error(Slosilo::Error::InsecureKeyStorage)
