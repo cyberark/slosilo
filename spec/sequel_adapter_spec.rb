@@ -8,11 +8,11 @@ describe Slosilo::Adapters::SequelAdapter do
   include_context "with example key"
 
   let(:model) { double "model" }
-  before { subject.stub create_model: model }
+  before { allow(subject).to receive_messages create_model: model }
   
   describe "#get_key" do
     context "when given key does not exist" do
-      before { model.stub :[] => nil }
+      before { allow(model).to receive_messages :[] => nil }
       it "returns nil" do
         expect(subject.get_key(:whatever)).not_to be
       end
@@ -31,13 +31,13 @@ describe Slosilo::Adapters::SequelAdapter do
     let(:id) { "id" }
     it "creates the key" do
       expect(model).to receive(:create).with id: id, key: key.to_der
-      model.stub columns: [:id, :key]
+      allow(model).to receive_messages columns: [:id, :key]
       subject.put_key id, key
     end
 
     it "adds the fingerprint if feasible" do
       expect(model).to receive(:create).with id: id, key: key.to_der, fingerprint: key.fingerprint
-      model.stub columns: [:id, :key, :fingerprint]
+      allow(model).to receive_messages columns: [:id, :key, :fingerprint]
       subject.put_key id, key
     end
   end

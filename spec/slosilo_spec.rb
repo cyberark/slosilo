@@ -32,7 +32,7 @@ describe Slosilo do
   end
   
   describe '.token_valid?' do
-    before { adapter['test'].stub token_valid?: false }
+    before { allow(adapter['test']).to receive_messages token_valid?: false }
     let(:key2) { double "key 2", token_valid?: false }
     let(:key3) { double "key 3", token_valid?: false }
     before do
@@ -44,7 +44,7 @@ describe Slosilo do
     subject { Slosilo.token_valid? token }
     
     context "when no key validates the token" do
-      before { Slosilo::Key.stub new: (double "key", token_valid?: false) }
+      before { allow(Slosilo::Key).to receive_messages new: (double "key", token_valid?: false) }
       it { is_expected.to be_falsey }
     end
     
@@ -52,7 +52,7 @@ describe Slosilo do
       let(:valid_key) { double token_valid?: true }
       let(:invalid_key) { double token_valid?: true }
       before do
-        Slosilo::Key.stub new: invalid_key
+        allow(Slosilo::Key).to receive_messages new: invalid_key
         adapter[:key2] = valid_key
       end
       
