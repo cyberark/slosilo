@@ -3,8 +3,6 @@ require "slosilo/keystore"
 require "slosilo/symmetric"
 require "slosilo/attr_encrypted"
 require "slosilo/random"
-require "slosilo/rack/middleware"
-require "slosilo/http_request"
 require "slosilo/errors"
 
 if defined? Sequel
