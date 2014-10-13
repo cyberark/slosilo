@@ -68,13 +68,17 @@ which can modify the database, `attr_encrypted` by itself IS NOT SECURE.
 ```ruby
 private_key = Slosilo::Key.new
 public_key = private_key.public
+```
 
-# Key dumping
+#### Key dumping
+```ruby
 k = public_key.to_s # => "-----BEGIN PUBLIC KEY----- ...
 (Slosilo::Key.new k) == public_key # => true
+```
 
-# Encryption
+#### Encryption
 
+```ruby
 encrypted = public_key.encrypt_message "eagle one sees many clouds"
 # => "\xA3\x1A\xD2\xFC\xB0 ...
 
@@ -83,9 +87,11 @@ public_key.decrypt_message encrypted
 
 private_key.decrypt_message encrypted
 # => "eagle one sees many clouds"
+```
 
-# Signing
+#### Signing
 
+```ruby
 token = private_key.signed_token "missile launch not authorized"
 # => {"data"=>"missile launch not authorized", "timestamp"=>"2014-10-13 12:41:25 UTC", "signature"=>"bSImk...DzV3o", "key"=>"455f7ac42d2d483f750b4c380761821d"}
 
@@ -98,7 +104,7 @@ public_key.token_valid? token # => false
 ### Keystore
 
 ```ruby
-Slosilo::encryption_key = ENV['SLOSILO_KEY]
+Slosilo::encryption_key = ENV['SLOSILO_KEY']
 Slosilo.adapter = Slosilo::Adapters::FileAdapter.new "~/.keys"
 
 Slosilo[:own] = Slosilo::Key.new
