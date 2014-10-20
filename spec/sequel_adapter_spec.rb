@@ -60,11 +60,7 @@ describe Slosilo::Adapters::SequelAdapter do
     let(:db) { Sequel.sqlite }
     before do
       allow(subject).to receive(:create_model).and_call_original
-      begin
-        Sequel::Model.cache_anonymous_models = false
-      rescue NoMethodError # sequel 4.0 moved the method
-        Sequel.cache_anonymous_models = false
-      end
+      Sequel.cache_anonymous_models = false
       Sequel::Model.db = db
     end
   end
