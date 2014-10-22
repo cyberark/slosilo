@@ -32,6 +32,11 @@ sym = Slosilo::Symmetric.new
 message = sym.decrypt ciphertext, key: key
 ```
 
+#### Warning
+
+The encrypted data is not authenticated; **it's not directly suitable for encrypting messages or anything else that can be tampered with**.
+
+
 ### Encryption mixin
 
 ```ruby
