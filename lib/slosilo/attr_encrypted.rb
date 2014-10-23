@@ -5,17 +5,31 @@ module Slosilo
   # so we encrypt sensitive attributes before storing them
   module EncryptedAttributes
     module ClassMethods
-      def attr_encrypted *a
+
+      # @param options [Hash]
+      # @option :aad [Proc-ish] A proc that can be called (instance_eval'd, in point of fact),
+      #   to fetch additional authentication data to include when encrypting the attribute.
+      #   Generally, you want to use a record id, like this:
+      #   ```
+      #   attr_encrypted :foo, aad: &:id
+      #   ```
+      def attr_encrypted *a, options={}
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes
+        aad = options[:aad]
+        aad_proc = if aad.respond_to?(:to_proc)
+           aad.to_proc
+        else
+          proc{ aad.to_s }
+        end
         include(accessors = Module.new)
         accessors.module_eval do 
           a.each do |attr|
             define_method "#{attr}=" do |value|
-              super(EncryptedAttributes.encrypt value)
+              super(EncryptedAttributes.encrypt(value, aad: instance_eval(&aad_proc)))
             end
             define_method attr do
-              EncryptedAttributes.decrypt(super())
+              EncryptedAttributes.decrypt(super(), aad: instance_eval(&aad_proc))
             end
           end
         end
@@ -27,14 +41,14 @@ module Slosilo
     end
 
     class << self
-      def encrypt value
+      def encrypt value, opts={}
         return nil unless value
-        cipher.encrypt value, key: key
+        cipher.encrypt value, key: key, aad: (options[:aad] || "")
       end
       
-      def decrypt ctxt
+      def decrypt ctxt, opts={}
         return nil unless ctxt
-        cipher.decrypt ctxt, key: key
+        cipher.decrypt ctxt, key: key, aad: (options[:aad] || "")
       end
 
       def key
