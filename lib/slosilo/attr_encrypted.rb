@@ -19,7 +19,9 @@ module Slosilo
       #
       #    The recommended way to use this option is to ommit it, for Sequel models having a primary key.
       #    or pass a symbol for an instance method that can be used as auth data.
-      def attr_encrypted *a, options={}
+      def attr_encrypted *a
+        options = a.last.is_a?(Hash) ? a.pop : {}
+
         aad_proc = build_aad_proc(options[:aad])
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes
@@ -39,26 +41,22 @@ module Slosilo
 
       private
       def build_aad_proc procish
-        return &proc if proc.respond_to?(:to_proc)
+        return procish.to_proc if procish.respond_to?(:to_proc)
 
-        # A string unless procish is nil
-        unless procish.nil?
-          value = procish.to_s
-          return proc{ value }
-        end
+        # Obviously it would be simpler to just return &:pk, or default procish to it.
+        # However, we can't check that the method exists here, because Sequel classes are
+        # built up out of several modules and that particular method might not be defined yet!
 
-        # Otherwise, try to call pk, return a string otherwise
-        # we might be able to return &:pk to avoid the respond_to? check each time
-        # the auth data is needed, but sequel builds it's classes out of multiple modules,
-        # and it's not certain that the #pk method will be defined yet.
-        warned = false
+        # A closure variable here lets us make sure the warning is only issued once.
+        container = []
+        container[0] = lambda { |instance|
+           container[0] = lambda {|_|}
+           $stderr.puts "Class #{instance.class.name} uses attr_encrypted, but without an :aad option or a #pk method.  This results in '' being used for the encrypted data, which is potentially insecure!"
+        }
         proc {
-          return pk if respond_to?(:pk)
-          unless warned
-            $stderr.puts "Warning: class #{self.class.name} does not respond_to #pk, and not alternative aad proc was given!"
-            warned = true
-          end
-          ""
+            return pk if respond_to?(:pk)
+            container[0][self]
+            ''
         }
       end
     end
