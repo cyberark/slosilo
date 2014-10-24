@@ -21,8 +21,13 @@ module Slosilo
       #    or pass a symbol for an instance method that can be used as auth data.
       def attr_encrypted *a
         options = a.last.is_a?(Hash) ? a.pop : {}
-
-        aad_proc = build_aad_proc(options[:aad])
+        aad = options[:aad]
+        unless aad.respond_to?(:to_proc)
+          aad = lambda { |obj|
+            obj.respond_to?(:pk) ? obj.pk : ""
+          }
+        end
+        aad = aad.to_proc
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes
 
@@ -30,35 +35,15 @@ module Slosilo
         accessors.module_eval do 
           a.each do |attr|
             define_method "#{attr}=" do |value|
-              super(EncryptedAttributes.encrypt(value, aad: instance_eval(&aad_proc)))
+              super(EncryptedAttributes.encrypt(value, aad: aad[self]))
             end
             define_method attr do
-              EncryptedAttributes.decrypt(super(), aad: instance_eval(&aad_proc))
+              EncryptedAttributes.decrypt(super(), aad: aad[self])
             end
           end
         end
       end
 
-      private
-      def build_aad_proc procish
-        return procish.to_proc if procish.respond_to?(:to_proc)
-
-        # Obviously it would be simpler to just return &:pk, or default procish to it.
-        # However, we can't check that the method exists here, because Sequel classes are
-        # built up out of several modules and that particular method might not be defined yet!
-
-        # A closure variable here lets us make sure the warning is only issued once.
-        container = []
-        container[0] = lambda { |instance|
-           container[0] = lambda {|_|}
-           $stderr.puts "Class #{instance.class.name} uses attr_encrypted, but without an :aad option or a #pk method.  This results in '' being used for the encrypted data, which is potentially insecure!"
-        }
-        proc {
-            return pk if respond_to?(:pk)
-            container[0][self]
-            ''
-        }
-      end
     end
     
     def self.included base
