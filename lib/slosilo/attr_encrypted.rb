@@ -22,23 +22,19 @@ module Slosilo
       def attr_encrypted *a
         options = a.last.is_a?(Hash) ? a.pop : {}
         aad = options[:aad]
-        unless aad.respond_to?(:to_proc)
-          aad = lambda { |obj|
-            obj.respond_to?(:pk) ? obj.pk : ""
-          }
-        end
-        aad = aad.to_proc
+        auth_data = aad.respond_to?(:to_proc) ? aad.to_proc : proc{ |_| aad.to_s }
+        raise ":aad proc must take one argument" unless auth_data.arity.abs == 1 # take abs to allow *args arity, -1
+
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes
-
         include(accessors = Module.new)
         accessors.module_eval do 
           a.each do |attr|
             define_method "#{attr}=" do |value|
-              super(EncryptedAttributes.encrypt(value, aad: aad[self]))
+              super(EncryptedAttributes.encrypt(value, aad: auth_data[self]))
             end
             define_method attr do
-              EncryptedAttributes.decrypt(super(), aad: aad[self])
+              EncryptedAttributes.decrypt(super(), aad: auth_data[self])
             end
           end
         end
