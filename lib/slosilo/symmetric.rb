@@ -9,14 +9,14 @@ module Slosilo
     def encrypt plaintext, opts = {}
       @cipher.reset
       @cipher.encrypt
-      @cipher.key = opts[:key]
+      @cipher.key = (opts[:key] or raise("missing :key option"))
       @cipher.iv = iv = random_iv
       @cipher.auth_data = opts[:aad] || "" # Nothing good happens if you set this to nil, or don't set it at all
       ctext = @cipher.update(plaintext) + @cipher.final
-      tag = @cipher.auth_tag
+      tag = @cipher.auth_tag(TAG_LENGTH)
       "#{tag}#{iv}#{ctext}"
     end
-    
+
     def decrypt ciphertext, opts = {}
       tag, iv, ctext = unpack ciphertext
 
