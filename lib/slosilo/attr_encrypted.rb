@@ -7,21 +7,24 @@ module Slosilo
     module ClassMethods
 
       # @param options [Hash]
-      # @option :aad [#to_proc, #to_s]  Provide additional authentication data for
-      #   message authentication.  This should be something unique to the instance having
-      #   this attribute, such as a primary key.  In particular, you have to be able to recover
-      #   it in order to decrypt attributes.  The following values are accepted:
+      # @option :aad [#to_proc, #to_s]  Provide additional authenticated data for
+      #   encryption.  This should be something unique to the instance having
+      #   this attribute, such as a primary key; this will ensure that an attacker can't swap
+      #   values around -- trying to decrypt value with a different auth data will fail.
+      #   This means you have to be able to recover it in order to decrypt attributes.
+      #   The following values are accepted:
       #
-      #   * Something proc-ish: This will be instance_eval'd each time auth data is needed.
-      #   * Something non-nil:  This will be to_s'd and used for all instances as auth data.
-      #   * nil:  If the class has an instance method #pk, we'll call that to get the auth_data.
-      #      Otherwise, we'll use an emmpty string.
+      #   * Something proc-ish: will be called with self each time auth data is needed.
+      #   * Something stringish: will be to_s-d and used for all instances as auth data.
+      #     Note that this will only prevent swapping in data using another string.
       #
-      #    The recommended way to use this option is to ommit it, for Sequel models having a primary key.
-      #    or pass a symbol for an instance method that can be used as auth data.
+      #   The recommended way to use this option is to pass a proc-ish that identifies the record.
+      #   Note the proc-ish can be a simple method name; for example in case of a Sequel::Model:
+      #       attr_encrypted :secret, aad: :pk
       def attr_encrypted *a
         options = a.last.is_a?(Hash) ? a.pop : {}
         aad = options[:aad]
+        # note nil.to_s is "", which is exactly the right thing
         auth_data = aad.respond_to?(:to_proc) ? aad.to_proc : proc{ |_| aad.to_s }
         raise ":aad proc must take one argument" unless auth_data.arity.abs == 1 # take abs to allow *args arity, -1
 
