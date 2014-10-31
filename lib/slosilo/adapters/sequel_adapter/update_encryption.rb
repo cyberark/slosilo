@@ -1,6 +1,8 @@
 require 'sequel'
 require 'slosilo'
 require 'slosilo/migration'
+require 'slosilo/adapters/sequel_adapter/migration'
+
 module Slosilo
 
   module Adapters::SequelAdapter::UpdateEncryption
@@ -13,7 +15,6 @@ module Slosilo
     end
 
     def upgrade! db
-      before_upgrade! db
 
       old_cipher = Slosilo::Migration::Symmetric.new
       new_cipher = Slosilo::Symmetric.new
@@ -27,12 +28,6 @@ module Slosilo
         ctext = new_cipher.encrypt ptext, key: key, aad: row[:fingerprint]
         keystore.where(fingerprint: row[:fingerprint]).update(key: Sequel.blob(ctext))
         progress.increment
-      end
-    end
-
-    def before_upgrade! db
-      unless db[keystore_table].columns.member?(:fingerprint)
-        require 'slosilo/adapters/sequel_adapter/migration'
       end
     end
 
