@@ -39,7 +39,7 @@ module Slosilo
       db[keystore_table].columns.member? :fingerprint
     end
 
-    def add_fingerprint_to_db db
+    def add_fingerprint_to_db! db
       db.transaction do
         db.alter_table keystore_table do
           add_column :fingerprint, String
