@@ -6,7 +6,12 @@ module Slosilo
     def initialize
       @cipher = OpenSSL::Cipher.new 'aes-256-gcm' # NB: has to be lower case for whatever reason.
     end
-    
+
+    # This lets us do a final sanity check in migrations from older encryption versions
+    def cipher_name
+      @cipher.name
+    end
+
     def encrypt plaintext, opts = {}
       @cipher.reset
       @cipher.encrypt
