@@ -23,7 +23,7 @@ module Slosilo
       keystore.each  do |row|
         ptext = old_cipher.decrypt row[:key], key: key
         ctext = new_cipher.encrypt ptext, key: key, aad: row[:fingerprint]
-        keystore.where(fingerprint: row[:fingerprint]).update(key: ctext)
+        keystore.where(fingerprint: row[:fingerprint]).update(key: Sequel.blob(ctext))
         progress.increment
       end
     end
