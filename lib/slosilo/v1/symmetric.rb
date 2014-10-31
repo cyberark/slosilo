@@ -1,3 +1,6 @@
+# require toplevel to make sure the warning is shown
+require 'slosilo/v1'
+
 module Slosilo::V1
   class Symmetric
     def initialize

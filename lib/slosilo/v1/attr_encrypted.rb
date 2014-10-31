@@ -1,4 +1,5 @@
-require 'slosilo/v1/symmetric'
+# require toplevel to make sure the warning is shown
+require 'slosilo/v1'
 
 module Slosilo::V1
   # we don't trust the database to keep all backups safe from the prying eyes

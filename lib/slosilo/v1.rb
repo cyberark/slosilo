@@ -4,6 +4,8 @@ module Slosilo
       WARNING!! You are loading compatibility Slosilo code. It has known potential
       security problems and is deprecated; this code is ONLY meant to be used in
       migrations and tests.
+
+      DO NOT USE THIS IN PRODUCTION CODE.
     """
     V1_WARNED = true
   end
