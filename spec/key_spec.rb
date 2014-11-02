@@ -153,7 +153,7 @@ describe Slosilo::Key do
     let(:token_to_sign) { { "data" => data, "timestamp" => "2012-01-01 01:01:01 UTC" } }
     let(:signature) { "signature" }
     let(:salt) { 'a pinch of salt' }
-    let(:expected_signature) { Base64::urlsafe_encode64 "\xB0\xCE{\x9FP\xEDV\x9C\xE7b\x8B[\xFAil\x87^\x96\x17Z\x97\x1D\xC2?B\x96\x9C\x8Ep-\xDF_\x8F\xC21\xD9^\xBC\n\x16\x04\x8DJ\xF6\xAF-\xEC\xAD\x03\xF9\xEE:\xDF\xB5\x8F\xF9\xF6\x81m\xAB\x9C\xAB1\x1E\x837\x8C\xFB\xA8P\xA8<\xEA\x1Dx\xCEd\xED\x84f\xA7\xB5t`\x96\xCC\x0F\xA9t\x8B\x9Fo\xBF\x92K\xFA\xFD\xC5?\x8F\xC68t\xBC\x9F\xDE\n$\xCA\xD2\x8F\x96\x0EtX2\x8Cl\x1E\x8Aa\r\x8D\xCAi\x86\x1A\xBD\x1D\xF7\xBC\x8561j\x91YlO\xFA(\x98\x10iq\xCC\xAF\x9BV\xC6\v\xBC\x10Xm\xCD\xFE\xAD=\xAA\x95,\xB4\xF7\xE8W\xB8\x83;\x81\x88\xE6\x01\xBA\xA5F\x91\x17\f\xCE\x80\x8E\v\x83\x9D<\x0E\x83\xF6\x8D\x03\xC0\xE8A\xD7\x90i\x1D\x030VA\x906D\x10\xA0\xDE\x12\xEF\x06M\xD8\x8B\xA9W\xC8\x9DTc\x8AJ\xA4\xC0\xD3!\xFA\x14\x89\xD1p\xB4J7\xA5\x04\xC2l\xDC8<\x04Y\xD8\xA4\xFB[\x89\xB1\xEC\xDA\xB8\xD7\xEA\x03Ja pinch of salt".force_encoding("ASCII-8BIT") }
+    let(:expected_signature) { "Z5L2MCjoe8ULXPa-3NFjoQ-Q6GxPD-8jptGRhE57R39Sk8gOFUyjuCFL8etgxTtb7N7RzYSP8TYr3maPLHZ_TEwocQux4e_EcRkYJrPED_EReyu01ttS1sj93pIWUR-WpUvd8Vh9xgqKywqwd2oBF9TkSLdsLp8jCe7vOEaM6jm_Wt8LDGzsLUXWm9Bs7kEJAvxB_hiv70FRhHJ_szg05pWGU194eYntL1Uz14ZZEspFZfrs0yndxaD3fiASCedF3EWU07wQcxCgiJ8hgwoa-YfmfrxjRinenuYAncjRcA-Q4B86meWXvRLGebZ9QpXTALfrWG4CU-_mJ7vfCPmzUWEgcGluY2ggb2Ygc2FsdA==" }
     let(:expected_token) { token_to_sign.merge "signature" => expected_signature, "key" => key_fingerprint }
     before do
       allow(key).to receive_messages shake_salt: salt
@@ -171,8 +171,8 @@ describe Slosilo::Key do
     subject { key.token_valid? token }
     it { is_expected.to be_truthy }
     
-    it "doesn't check signature on the advisory key field" do
-      expect(key.token_valid?(token.merge "key" => key_fingerprint)).to be_truthy
+    it "does check signature on the key field" do
+      expect(key.token_valid?(token.merge "key" => key_fingerprint)).to be_falsey
     end
     
     it "rejects the token if the key field is present and doesn't match" do
