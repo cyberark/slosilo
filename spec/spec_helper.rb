@@ -79,3 +79,30 @@ ooQ2FuL0K6ukQfHPjuMswqi41lmVH8gIVqVC+QnImUCrGxH9WXWy
     before { allow(Slosilo).to receive(:[]).with(:own).and_return key }
   end
 end
+
+class Object
+  def ergo
+    (block_given? && mapped = yield(self)) ? mapped : self
+  end
+end
+
+class Hash
+  def except *keys
+    dup.except! *keys
+  end
+  def except! *keys
+    tap{ keys.flatten.each{ |k| delete k } }
+  end
+  def compact
+    dup.compact!
+  end
+  def compact!
+    tap{ select!{|k,v| v} }
+  end
+end
+
+class NilClass
+  def ergo
+    nil
+  end
+end
