@@ -24,7 +24,7 @@ module Slosilo
     def encrypt plaintext
       key = cipher.random_key
       ctxt = cipher.encrypt plaintext, key: key
-      key = @key.public_encrypt key
+      key = @key.public_encrypt key, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING
       [ctxt, key]
     end
 
@@ -34,7 +34,7 @@ module Slosilo
     end
     
     def decrypt ciphertext, skey
-      key = @key.private_decrypt skey
+      key = @key.private_decrypt skey, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING
       cipher.decrypt ciphertext, key: key
     end
 
