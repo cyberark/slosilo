@@ -14,10 +14,17 @@ module Slosilo
     end
 
     def upgrade! db
+      keystore = db[keystore_table]
+      return unless keystore.count > 0
+
+      key = Slosilo::encryption_key
+      if key.nil?
+        warn "Slosilo::encryption_key not set, assuming unencrypted key store"
+        return
+      end
+
       old_cipher = Slosilo::Migration::Symmetric.new
       new_cipher = Slosilo::Symmetric.new
-      key = Slosilo::encryption_key || raise("Missing Slosilo::encryption_key!")
-      keystore = db[keystore_table]
 
       progress = progress_bar keystore.count
 
@@ -54,6 +61,6 @@ end
 #   end
 #
 #   down do
-#     raise "Irreversable!"
+#     raise "Irreversible!"
 #   end
 # end
