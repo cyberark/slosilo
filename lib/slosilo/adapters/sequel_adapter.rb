@@ -14,7 +14,7 @@ module Slosilo
       def create_model
         model = Sequel::Model(:slosilo_keystore)
         model.unrestrict_primary_key
-        model.attr_encrypted(:key, aad: :fingerprint) if secure?
+        model.attr_encrypted(:key, aad: :id) if secure?
         model
       end
       
