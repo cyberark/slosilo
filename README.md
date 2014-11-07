@@ -2,7 +2,7 @@
 
 Slosilo is providing a ruby interface to some cryptographic primitives:
 - symmetric encryption,
-- a mixin for easy encryption of object attributes (WARNING: unauthenticated, see below),
+- a mixin for easy encryption of object attributes,
 - asymmetric encryption and signing,
 - a keystore in a postgres sequel db -- it allows easy storage and retrieval of keys,
 - a keystore in files.
@@ -17,6 +17,20 @@ And then execute:
 
     $ bundle
 
+## Compatibility
+
+Version 2.0 introduced new symmetric encryption scheme using AES-256-GCM
+for authenticated encryption. It allows you to provide AAD on all symmetric
+encryption primitives. It's also **NOT COMPATIBLE** with CBC used in version <2.
+
+This means you'll have to migrate all your existing data. There's no easy way to
+do this currently provided; it's recommended to create a database migration and
+put relevant code fragments in it directly. (This will also have the benefit of making
+the migration self-contained.)
+
+Since symmetric encryption is used in processing asymetrically encrypted messages,
+this incompatibility extends to those too.
+
 ## Usage
 
 ### Symmetric encryption
@@ -24,18 +38,15 @@ And then execute:
 ```ruby
 sym = Slosilo::Symmetric.new
 key = sym.random_key
-ciphertext = sym.encrypt "secret message", key: key
+# additional authenticated data
+message_id = "message 001"
+ciphertext = sym.encrypt "secret message", key: key, aad: message_id
 ```
 
 ```ruby
 sym = Slosilo::Symmetric.new
-message = sym.decrypt ciphertext, key: key
+message = sym.decrypt ciphertext, key: key, aad: message_id
 ```
-
-#### Warning
-
-The encrypted data is not authenticated; **it's not directly suitable for encrypting messages or anything else that can be tampered with**.
-
 
 ### Encryption mixin
 
@@ -44,10 +55,14 @@ require 'slosilo'
 
 class Foo
   attr_accessor :foo
-  attr_encrypted :foo
+  attr_encrypted :foo, aad: :id
 
   def raw_foo
     @foo
+  end
+
+  def id
+    "unique record id"
   end
 end
 
@@ -60,13 +75,6 @@ obj.foo # => "bar"
 ```
 
 You can safely use it in ie. ActiveRecord::Base or Sequel::Model subclasses.
-
-#### Warning
-
-The encrypted data is not authenticated; it's intended to prevent
-opportunistic access to secrets by a third party which gets hold of a database
-dump. *IT DOES NOT prevent tampering.* If your threat model includes an attacker
-which can modify the database, `attr_encrypted` by itself IS NOT SECURE.
 
 ### Asymmetric encryption and signing
 
