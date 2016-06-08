@@ -121,6 +121,12 @@ module Slosilo
         value
       else
         value.to_json
+      end.tap do |string|
+        # Ensure that the string is encoded as raw bytes so that we don't have
+        # encoding errors when smushing it together with the salt.
+        if string.encoding != Encoding::ASCII_8BIT
+          string.force_encoding Encoding::ASCII_8BIT
+        end
       end
     end
     
