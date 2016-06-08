@@ -145,6 +145,23 @@ describe Slosilo::Key do
         expect(key.sign("this sentence is not this sentence")).to eq(expected_signature)
       end
     end
+
+    context "when given a Hash containing non-ascii characters" do
+      let(:unicode){ "adèle.dupuis" }
+      let(:encoded){
+        unicode.dup.tap{|s| s.force_encoding Encoding::ASCII_8BIT}
+      }
+      let(:hash){ {"data" => unicode} }
+
+      it "converts the value to raw bytes before signing it" do
+        expect(key).to receive(:sign_string).with "[\"data\", \"#{encoded}\"]"
+        key.sign hash
+      end
+
+      it "signs the data successfully" do
+        key.sign hash
+      end
+    end
   end
   
   describe "#signed_token" do
