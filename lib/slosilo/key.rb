@@ -114,13 +114,24 @@ module Slosilo
     # Note that this is currently somewhat shallow stringification -- 
     # to implement originating tokens we may need to make it deeper.
     def stringify value
-      case value
+      string = case value
       when Hash
         value.to_a.sort.to_json
       when String
         value
       else
         value.to_json
+      end
+
+      # Make sure that the string is ascii_8bit (i.e. raw bytes), and represents
+      # the utf-8 encoding of the string.  This accomplishes two things: it normalizes
+      # the representation of the string at the byte level (so we don't have an error if
+      # one username is submitted as ISO-whatever, and the next as UTF-16), and it prevents
+      # an incompatible encoding error when we concatenate it with the salt.
+      if string.encoding != Encoding::ASCII_8BIT
+        string.encode(Encoding::UTF_8).force_encoding(Encoding::ASCII_8BIT)
+      else
+        string
       end
     end
     
