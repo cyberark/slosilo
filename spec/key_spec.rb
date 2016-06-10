@@ -154,11 +154,7 @@ describe Slosilo::Key do
       let(:hash){ {"data" => unicode} }
 
       it "converts the value to raw bytes before signing it" do
-        expect(key).to receive(:sign_string).with "[[\"data\",\"#{encoded}\"]]"
-        key.sign hash
-      end
-
-      it "signs the data successfully" do
+        expect(key).to receive(:sign_string).with("[[\"data\",\"#{encoded}\"]]").and_call_original
         key.sign hash
       end
     end
