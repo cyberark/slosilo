@@ -24,12 +24,12 @@ describe Slosilo::Symmetric do
     context "when the ciphertext has been messed with" do
       let(:ciphertext) {  "pwnd!" } # maybe we should do something more realistic like add some padding?
       it "raises an exception" do
-        expect{ subject.decrypt(ciphertext, key: key, aad: auth_data)}.to raise_exception
+        expect{ subject.decrypt(ciphertext, key: key, aad: auth_data)}.to raise_exception /Invalid version/
       end
       context "by adding a trailing 0" do
         let(:new_ciphertext){ ciphertext + '\0' }
         it "raises an exception" do
-          expect{ subject.decrypt(new_ciphertext, key: key, aad: auth_data) }.to raise_exception
+          expect{ subject.decrypt(new_ciphertext, key: key, aad: auth_data) }.to raise_exception /Invalid version/
         end
       end
     end
@@ -44,7 +44,7 @@ describe Slosilo::Symmetric do
 
       context "and the ciphertext has been messed with" do
         it "raises an exception" do
-          expect{ subject.decrypt(ciphertext + "\0\0\0", key: key, aad: auth_data)}.to raise_exception
+          expect{ subject.decrypt(ciphertext + "\0\0\0", key: key, aad: auth_data)}.to raise_exception OpenSSL::Cipher::CipherError
         end
       end
     end
@@ -52,7 +52,7 @@ describe Slosilo::Symmetric do
     context "when the auth data doesn't match" do
       let(:auth_data){ "asdf" }
       it "raises an exception" do
-        expect{ subject.decrypt(ciphertext, key: key, aad: auth_data)}.to raise_exception
+        expect{ subject.decrypt(ciphertext, key: key, aad: auth_data)}.to raise_exception OpenSSL::Cipher::CipherError
       end
     end
   end

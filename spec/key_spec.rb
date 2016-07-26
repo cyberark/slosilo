@@ -120,7 +120,7 @@ describe Slosilo::Key do
     context "when given something else" do
       subject { Slosilo::Key.new "foo" }
       it "fails early" do
-        expect { subject }.to raise_error
+        expect { subject }.to raise_error ArgumentError
       end
     end
   end

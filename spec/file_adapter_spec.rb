@@ -22,7 +22,7 @@ describe Slosilo::Adapters::FileAdapter do
     context "unacceptable id" do
       let(:id) { "foo.bar" }
       it "isn't accepted" do
-        expect { subject.put_key id, key }.to raise_error
+        expect { subject.put_key id, key }.to raise_error /id should not contain a period/
       end    
     end
     context "acceptable id" do
