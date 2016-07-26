@@ -110,5 +110,19 @@ describe Slosilo::EncryptedAttributes do
 
   end
 
+  context "with direct usage" do
+    let(:klass) do
+      Class.new do
+        attr_accessor :foo
+        attr_encrypted :foo
+      end
+    end
 
+    subject { klass.new }
+
+    it "encrypts the attributes" do
+      subject.foo = 'bar'
+      expect(subject.instance_variable_get :@foo).to_not eq 'bar'
+    end
+  end
 end

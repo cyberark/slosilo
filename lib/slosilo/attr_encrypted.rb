@@ -30,15 +30,14 @@ module Slosilo
 
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes
-        include(accessors = Module.new)
-        accessors.module_eval do 
-          a.each do |attr|
-            define_method "#{attr}=" do |value|
-              super(EncryptedAttributes.encrypt(value, aad: auth_data[self]))
-            end
-            define_method attr do
-              EncryptedAttributes.decrypt(super(), aad: auth_data[self])
-            end
+        a.each do |attr|
+          orig_setter = instance_method "#{attr}="
+          define_method "#{attr}=" do |value|
+            orig_setter.bind(self)[EncryptedAttributes.encrypt(value, aad: auth_data[self])]
+          end
+          orig_getter = instance_method attr
+          define_method attr do
+            EncryptedAttributes.decrypt(orig_getter.bind(self)[], aad: auth_data[self])
           end
         end
       end
