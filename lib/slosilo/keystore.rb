@@ -60,14 +60,20 @@ module Slosilo
     end
     
     def token_signer token
-      key, id = keystore.get_by_fingerprint token['key']
+      unless (fingerprint = token['key'])
+        # see if maybe it's a JWT
+        token = JWT token
+        fingerprint = token.header['kid']
+      end
+
+      key, id = keystore.get_by_fingerprint fingerprint
       if key && key.token_valid?(token)
         return id
       else
         return nil
       end
     end
-    
+
     attr_accessor :adapter
     
     private

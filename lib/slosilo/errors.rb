@@ -8,5 +8,8 @@ module Slosilo
         super
       end
     end
+
+    class TokenValidationError < Error
+    end
   end
 end

@@ -1,3 +1,4 @@
+require "slosilo/jwt"
 require "slosilo/version"
 require "slosilo/keystore"
 require "slosilo/symmetric"

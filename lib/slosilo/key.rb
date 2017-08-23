@@ -3,6 +3,8 @@ require 'json'
 require 'base64'
 require 'time'
 
+require 'slosilo/errors'
+
 module Slosilo
   class Key
     def initialize raw_key = nil
@@ -71,13 +73,55 @@ module Slosilo
       token["key"] = fingerprint
       token
     end
+
+    JWT_ALGORITHM = 'conjur.org/slosilo/v2'.freeze
+
+    def issue_jwt claims
+      token = Slosilo::JWT.new claims
+      token.add_signature \
+          alg: JWT_ALGORITHM,
+          kid: fingerprint,
+          &method(:sign)
+      token.freeze
+    end
+
+    DEFAULT_EXPIRATION = 8 * 60
     
-    def token_valid? token, expiry = 8 * 60
+    def token_valid? token, expiry = DEFAULT_EXPIRATION
+      return jwt_valid? token if token.respond_to? :header
       token = token.clone
       expected_key = token.delete "key"
       return false if (expected_key and (expected_key != fingerprint))
       signature = Base64::urlsafe_decode64(token.delete "signature")
       (Time.parse(token["timestamp"]) + expiry > Time.now) && verify_signature(token, signature)
+    end
+
+    # Validate JWT
+    # @param token [JWT] pre-parsed token to verify
+    # @return [Boolean]
+    def jwt_valid? token
+      validate_jwt token
+      true
+    rescue
+      false
+    end
+
+    # Validate JWT
+    # @param token [JWT] pre-parsed token to verify
+    # @note raises on error
+    def validate_jwt token
+      def err msg
+        raise Error::TokenValidationError, msg, caller
+      end
+
+      header = token.header
+      err 'unrecognized algorithm' unless header['alg'] == JWT_ALGORITHM
+      err 'mismatched key' if (kid = header['kid']) && kid != fingerprint
+      iat = Time.at token.claims['iat'] || err('unknown issuing time')
+      exp = Time.at token.claims['exp'] || (iat + DEFAULT_EXPIRATION)
+      err 'token expired' if exp <= Time.now
+      err 'invalid signature' unless verify_signature token.string_to_sign, token.signature
+      true
     end
     
     def sign_string value
