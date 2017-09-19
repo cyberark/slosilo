@@ -29,7 +29,7 @@ module Slosilo
     # the token will be frozen after this operation.
     def add_signature header, &sign
       @claims = canonicalize_claims.freeze
-      @header = JSONHash[header.merge typ: 'JWT'].freeze
+      @header = JSONHash[header].freeze
       @signature = sign[string_to_sign].freeze
       freeze
     end
