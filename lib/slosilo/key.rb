@@ -76,6 +76,13 @@ module Slosilo
 
     JWT_ALGORITHM = 'conjur.org/slosilo/v2'.freeze
 
+    # Issue a JWT with the given claims.
+    # `iat` (issued at) claim is automatically added.
+    # Other interesting claims you can give are:
+    # - `sub` - token subject, for example a user name;
+    # - `exp` - expiration time (absolute);
+    # - `cidr` (Conjur extension) - array of CIDR masks that are accepted to
+    #   make requests that bear this token
     def issue_jwt claims
       token = Slosilo::JWT.new claims
       token.add_signature \
@@ -96,7 +103,11 @@ module Slosilo
       (Time.parse(token["timestamp"]) + expiry > Time.now) && verify_signature(token, signature)
     end
 
-    # Validate JWT
+    # Validate a JWT.
+    #
+    # Convenience method calling #validate_jwt and returning false if an
+    # exception is raised.
+    #
     # @param token [JWT] pre-parsed token to verify
     # @return [Boolean]
     def jwt_valid? token
@@ -106,9 +117,22 @@ module Slosilo
       false
     end
 
-    # Validate JWT
+    # Validate a JWT.
+    #
+    # First checks whether algorithm is 'conjur.org/slosilo/v2' and the key id
+    # matches this key's fingerprint. Then verifies if the token is not expired,
+    # as indicated by the `exp` claim; in its absence tokens are assumed to
+    # expire in `iat` + 8 minutes.
+    #
+    # If those checks pass, finally the signature is verified.
+    #
+    # @raises TokenValidationError if any of the checks fail.
+    #
+    # @note It's the responsibility of the caller to examine other claims
+    # included in the token; consideration needs to be given to handling
+    # unrecognized claims.
+    #
     # @param token [JWT] pre-parsed token to verify
-    # @note raises on error
     def validate_jwt token
       def err msg
         raise Error::TokenValidationError, msg, caller
