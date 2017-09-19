@@ -106,6 +106,14 @@ describe Slosilo do
         )).to eq 'test'
       end
 
+      it "accepts pre-parsed JWT token" do
+        expect(Slosilo.token_signer(Slosilo::JWT(
+          'protected' => 'eyJraWQiOiJkMjhlM2EzNDdlMzY4NDE2YjMxMjlhNDBjMWI4ODdmZSJ9',
+          'payload' => 'e30=',
+          'signature' => 'c2ln'
+        ))).to eq 'test'
+      end
+
       it "accepts compact serialization" do
         expect(Slosilo.token_signer(
           'eyJraWQiOiJkMjhlM2EzNDdlMzY4NDE2YjMxMjlhNDBjMWI4ODdmZSJ9.e30=.c2ln'

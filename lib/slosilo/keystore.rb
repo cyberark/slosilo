@@ -60,10 +60,12 @@ module Slosilo
     end
     
     def token_signer token
-      unless (fingerprint = token['key'])
+      begin
         # see if maybe it's a JWT
         token = JWT token
         fingerprint = token.header['kid']
+      rescue ArgumentError
+        fingerprint = token['key']
       end
 
       key, id = keystore.get_by_fingerprint fingerprint
