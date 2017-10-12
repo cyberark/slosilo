@@ -59,15 +59,26 @@ module Slosilo
       keystore.any? { |k| k.token_valid? token }
     end
     
+    # Looks up the signer by public key fingerprint and checks the validity
+    # of the signature. If the token is JWT, exp and/or iat claims are also
+    # verified; the caller is responsible for validating any other claims.
     def token_signer token
-      key, id = keystore.get_by_fingerprint token['key']
+      begin
+        # see if maybe it's a JWT
+        token = JWT token
+        fingerprint = token.header['kid']
+      rescue ArgumentError
+        fingerprint = token['key']
+      end
+
+      key, id = keystore.get_by_fingerprint fingerprint
       if key && key.token_valid?(token)
         return id
       else
         return nil
       end
     end
-    
+
     attr_accessor :adapter
     
     private
