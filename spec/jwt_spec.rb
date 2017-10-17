@@ -14,8 +14,7 @@ describe Slosilo::Key do
 
       expect(tok.header).to eq \
         alg: 'conjur.org/slosilo/v2',
-        kid: key_fingerprint,
-        typ: 'JWT'
+        kid: key_fingerprint
       expect(tok.claims).to eq \
         iat: 1401938552,
         sub: 'host/example',
@@ -38,7 +37,7 @@ describe Slosilo::JWT do
     it 'allows conversion to JSON representation with #to_json' do
       json = JSON.load token.to_json
       expect(JSON.load Base64.urlsafe_decode64 json['protected']).to eq \
-          'alg' => 'test-sig', 'typ' => 'JWT'
+          'alg' => 'test-sig'
       expect(JSON.load Base64.urlsafe_decode64 json['payload']).to eq \
           'iat' => 1401938552, 'test' => 'token'
       expect(Base64.urlsafe_decode64 json['signature']).to eq signature
@@ -47,7 +46,7 @@ describe Slosilo::JWT do
     it 'allows conversion to compact representation with #to_s' do
       h, c, s = token.to_s.split '.'
       expect(JSON.load Base64.urlsafe_decode64 h).to eq \
-          'alg' => 'test-sig', 'typ' => 'JWT'
+          'alg' => 'test-sig'
       expect(JSON.load Base64.urlsafe_decode64 c).to eq \
           'iat' => 1401938552, 'test' => 'token'
       expect(Base64.urlsafe_decode64 s).to eq signature

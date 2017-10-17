@@ -24,4 +24,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'io-grab', '~> 0.0.1'
   gem.add_development_dependency 'sequel' # for sequel tests
   gem.add_development_dependency 'sqlite3' # for sequel tests
+  gem.add_development_dependency 'activesupport' # for convenience in specs
 end
