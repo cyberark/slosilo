@@ -60,7 +60,7 @@ describe Slosilo::Adapters::SequelAdapter do
     let(:db) { Sequel.sqlite }
     before do
       allow(subject).to receive(:create_model).and_call_original
-      Sequel.cache_anonymous_models = false
+      Sequel::Model.cache_anonymous_models = false
       Sequel::Model.db = db
     end
   end
