@@ -15,6 +15,10 @@ module Slosilo
       else
         OpenSSL::PKey::RSA.new 2048
       end
+    rescue OpenSSL::PKey::PKeyError => e
+      # old openssl versions used to report ArgumentError
+      # which arguably makes more sense here, so reraise as that
+      raise ArgumentError, e, e.backtrace
     end
     
     attr_reader :key
