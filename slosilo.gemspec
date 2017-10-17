@@ -1,5 +1,12 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/slosilo/version', __FILE__)
+begin
+  require File.expand_path('../lib/slosilo/version', __FILE__)
+rescue LoadError
+  # so that bundle can be run without the app code
+  module Slosilo
+    VERSION = '0.0.0'
+  end
+end
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Rafa\305\202 Rzepecki"]
