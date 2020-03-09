@@ -41,7 +41,7 @@ Dg1ikwi8GUF4HPZe9DyhXgDhg19wM/qcpjX8bSypsUWHWP+FanhjdWU=
 -----END RSA PRIVATE KEY-----
         """ }
   let (:key) { Slosilo::Key.new rsa.to_der }
-  let (:key_fingerprint) { "d28e3a347e368416b3129a40c1b887fe" }
+  let (:key_fingerprint) { "107bdb8501c419fad2fdb20b467d4d0a62a16a98c35f2da0eb3b1ff929795ad9" }
 
   let (:another_rsa) do
     OpenSSL::PKey::RSA.new """

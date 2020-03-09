@@ -158,7 +158,7 @@ module Slosilo
     end
     
     def fingerprint
-      @fingerprint ||= OpenSSL::Digest::MD5.hexdigest key.public_key.to_der
+      @fingerprint ||= OpenSSL::Digest::SHA256.hexdigest key.public_key.to_der
     end
 
     def == other

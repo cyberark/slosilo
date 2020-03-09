@@ -100,7 +100,7 @@ describe Slosilo do
 
       it "accepts pre-parsed JSON serialization" do
         expect(Slosilo.token_signer(
-          'protected' => 'eyJraWQiOiJkMjhlM2EzNDdlMzY4NDE2YjMxMjlhNDBjMWI4ODdmZSJ9',
+          'protected' => 'eyJraWQiOiIxMDdiZGI4NTAxYzQxOWZhZDJmZGIyMGI0NjdkNGQwYTYyYTE2YTk4YzM1ZjJkYTBlYjNiMWZmOTI5Nzk1YWQ5In0=',
           'payload' => 'e30=',
           'signature' => 'c2ln'
         )).to eq 'test'
@@ -108,7 +108,7 @@ describe Slosilo do
 
       it "accepts pre-parsed JWT token" do
         expect(Slosilo.token_signer(Slosilo::JWT(
-          'protected' => 'eyJraWQiOiJkMjhlM2EzNDdlMzY4NDE2YjMxMjlhNDBjMWI4ODdmZSJ9',
+          'protected' => 'eyJraWQiOiIxMDdiZGI4NTAxYzQxOWZhZDJmZGIyMGI0NjdkNGQwYTYyYTE2YTk4YzM1ZjJkYTBlYjNiMWZmOTI5Nzk1YWQ5In0=',
           'payload' => 'e30=',
           'signature' => 'c2ln'
         ))).to eq 'test'
@@ -116,7 +116,7 @@ describe Slosilo do
 
       it "accepts compact serialization" do
         expect(Slosilo.token_signer(
-          'eyJraWQiOiJkMjhlM2EzNDdlMzY4NDE2YjMxMjlhNDBjMWI4ODdmZSJ9.e30=.c2ln'
+          'eyJraWQiOiIxMDdiZGI4NTAxYzQxOWZhZDJmZGIyMGI0NjdkNGQwYTYyYTE2YTk4YzM1ZjJkYTBlYjNiMWZmOTI5Nzk1YWQ5In0=.e30=.c2ln'
         )).to eq 'test'
       end
     end
