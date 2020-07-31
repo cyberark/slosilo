@@ -14,6 +14,9 @@ pipeline {
         sh './test.sh'
 
         junit 'spec/reports/*.xml'
+        cobertura coberturaReportFile: 'spec/coverage/coverage.xml'
+        sh 'cp spec/coverage/coverage.xml cobertura.xml'
+        ccCoverage("cobertura", "github.com/cyberark/slosilo")
       }
     }
 

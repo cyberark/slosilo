@@ -17,6 +17,8 @@ docker run --cidfile $cidfile -v /app/spec/reports $iid bundle exec rake jenkins
 cid=$(cat $cidfile)
 
 docker cp $cid:/app/spec/reports spec/
+docker cp $cid:/app/coverage spec
+
 docker rm $cid
 
 # untag, will use cache next time if available but no junk will be left
