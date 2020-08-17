@@ -49,6 +49,13 @@ module Slosilo
         end
       end
 
+      def recalculate_fingerprints
+        model.each do |m|
+          m.update fingerprint: Slosilo::Key.new(m.key).fingerprint
+        end
+      end
+
+
       def migrate!
         unless fingerprint_in_db?
           model.db.transaction do
@@ -59,9 +66,7 @@ module Slosilo
             # reload the schema
             model.set_dataset model.dataset
 
-            model.each do |m|
-              m.update fingerprint: Slosilo::Key.new(m.key).fingerprint
-            end
+            recalculate_fingerprints
 
             model.db.alter_table :slosilo_keystore do
               set_column_not_null :fingerprint

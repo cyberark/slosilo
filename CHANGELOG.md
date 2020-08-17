@@ -1,3 +1,8 @@
+# v2.2.2
+
+* Add rake task `slosilo:recalculate_fingerprints` which rehashes the fingerprints in the keystore.
+**Note**: After migrating the slosilo keystore, run the above rake task to ensure the fingerprints are correctly hashed.
+
 # v2.2.1
 
 * Use SHA256 algorithm instead of MD5 for public key fingerprints.
