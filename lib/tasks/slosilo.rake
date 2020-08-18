@@ -24,4 +24,9 @@ namespace :slosilo do
   task :migrate => :environment do |t|
     Slosilo.adapter.migrate!
   end
+
+  desc "Recalculate fingerprints in keystore"
+  task :recalculate_fingerprints => :environment do |t|
+    Slosilo.adapter.recalculate_fingerprints
+  end
 end
