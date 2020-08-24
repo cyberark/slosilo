@@ -1,4 +1,7 @@
 require "simplecov"
+require "simplecov-cobertura"
+
+SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 SimpleCov.start
 
 require 'slosilo'
@@ -74,7 +77,7 @@ ooQ2FuL0K6ukQfHPjuMswqi41lmVH8gIVqVC+QnImUCrGxH9WXWy
 -----END RSA PRIVATE KEY-----
     """
   end
-  
+
   def self.mock_own_key
     before { allow(Slosilo).to receive(:[]).with(:own).and_return key }
   end
