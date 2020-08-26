@@ -50,8 +50,12 @@ module Slosilo
       end
 
       def recalculate_fingerprints
-        model.each do |m|
-          m.update fingerprint: Slosilo::Key.new(m.key).fingerprint
+        # Use a transaction to ensure that all fingerprints are updated together. If any update fails,
+        # we want to rollback all updates.
+        model.db.transaction do
+          model.each do |m|
+            m.update fingerprint: Slosilo::Key.new(m.key).fingerprint
+          end
         end
       end
 
