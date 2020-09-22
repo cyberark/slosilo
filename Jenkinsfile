@@ -10,13 +10,22 @@ pipeline {
 
   stages {
     stage('Test') {
-      steps {
-        sh './test.sh'
+      parallel {
+        stage('Run tests on EE') {
+          agent { label 'executor-v2-rhel-ee' }
+          steps {
+            sh './test.sh'
+          }
+          post { always {
+            stash name: 'eeTestResults', includes: 'spec/reports/*.xml', allowEmpty:true
+          }}
+        }
 
-        junit 'spec/reports/*.xml'
-        cobertura coberturaReportFile: 'spec/coverage/coverage.xml'
-        sh 'cp spec/coverage/coverage.xml cobertura.xml'
-        ccCoverage("cobertura", "github.com/cyberark/slosilo")
+        stage('Run tests') {
+          steps {
+            sh './test.sh'
+          }
+        }
       }
     }
 
@@ -52,6 +61,14 @@ pipeline {
 
   post {
     always {
+      dir('ee-results'){
+        unstash 'eeTestResults'
+      }
+      junit 'spec/reports/*.xml, ee-results/spec/reports/*.xml'
+      cobertura coberturaReportFile: 'spec/coverage/coverage.xml'
+      sh 'cp spec/coverage/coverage.xml cobertura.xml'
+      ccCoverage("cobertura", "github.com/cyberark/slosilo")
+
       cleanupAndNotify(currentBuild.currentResult)
     }
   }
