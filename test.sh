@@ -3,7 +3,7 @@
 iid=slosilo-test-$(date +%s)
 
 docker build -t $iid -f - . << EOF
-  FROM ruby
+  FROM ruby:3.0
   WORKDIR /app
   COPY Gemfile slosilo.gemspec ./
   RUN bundle

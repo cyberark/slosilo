@@ -19,6 +19,9 @@ And then execute:
 
 ## Compatibility
 
+Version 3.0 introduced full transition to Ruby 3.
+Consumers who use slosilo in Ruby 2 projects, shall use slosilo V2.X.X.
+
 Version 2.0 introduced new symmetric encryption scheme using AES-256-GCM
 for authenticated encryption. It allows you to provide AAD on all symmetric
 encryption primitives. It's also **NOT COMPATIBLE** with CBC used in version <2.

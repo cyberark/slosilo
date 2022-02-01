@@ -26,7 +26,10 @@ module Slosilo
         aad = options[:aad]
         # note nil.to_s is "", which is exactly the right thing
         auth_data = aad.respond_to?(:to_proc) ? aad.to_proc : proc{ |_| aad.to_s }
-        raise ":aad proc must take one argument" unless auth_data.arity.abs == 1 # take abs to allow *args arity, -1
+
+        # In ruby 3 .arity for #proc returns both 1 and 2, depends on internal #proc
+        # This method is also being called with aad which is string, in such case the arity is 1
+        raise ":aad proc must take two arguments" unless (auth_data.arity.abs == 2 || auth_data.arity.abs == 1)
 
         # push a module onto the inheritance hierarchy
         # this allows calling super in classes

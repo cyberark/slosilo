@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.name          = "slosilo"
   gem.require_paths = ["lib"]
   gem.version       = Slosilo::VERSION
-  gem.required_ruby_version = '>= 1.9.3'
+  gem.required_ruby_version = '>= 3.0.0'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 3.0'
