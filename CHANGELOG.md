@@ -1,3 +1,7 @@
+# v3.0.0
+
+* Transition to Ruby 3. Consuming projects based on Ruby 2 shall use slosilo V2.X.X.
+
 # v2.2.2
 
 * Add rake task `slosilo:recalculate_fingerprints` which rehashes the fingerprints in the keystore.

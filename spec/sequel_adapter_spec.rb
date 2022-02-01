@@ -30,13 +30,13 @@ describe Slosilo::Adapters::SequelAdapter do
   describe "#put_key" do
     let(:id) { "id" }
     it "creates the key" do
-      expect(model).to receive(:create).with id: id, key: key.to_der
+      expect(model).to receive(:create).with(hash_including(:id => id, :key => key.to_der))
       allow(model).to receive_messages columns: [:id, :key]
       subject.put_key id, key
     end
 
     it "adds the fingerprint if feasible" do
-      expect(model).to receive(:create).with id: id, key: key.to_der, fingerprint: key.fingerprint
+      expect(model).to receive(:create).with(hash_including(:id => id, :key => key.to_der, :fingerprint => key.fingerprint))
       allow(model).to receive_messages columns: [:id, :key, :fingerprint]
       subject.put_key id, key
     end
