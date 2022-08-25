@@ -3,6 +3,10 @@
 pipeline {
   agent { label 'executor-v2' }
 
+  triggers {
+    cron(getDailyCronString())
+  }
+
   options {
     timestamps()
     buildDiscarder(logRotator(daysToKeepStr: '30'))
