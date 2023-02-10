@@ -1,3 +1,8 @@
+# v3.0.1
+
+ * The symmetric cipher class now encrypts and decrypts in a thread-safe manner.
+   [cyberark/slosilo#31](https://github.com/cyberark/slosilo/pull/31)
+
 # v3.0.0
 
 * Transition to Ruby 3. Consuming projects based on Ruby 2 shall use slosilo V2.X.X.

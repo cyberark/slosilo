@@ -14,8 +14,29 @@ describe Slosilo::Symmetric do
       expect(subject.encrypt(plaintext, key: key, aad: auth_data)).to eq(ciphertext)
     end
   end
-  
+
   describe '#decrypt' do
+
+    it "doesn't fail when called by multiple threads" do
+      threads = []
+
+      begin
+        # Verify we can successfuly decrypt using many threads without OpenSSL
+        # errors.
+        1000.times do
+          threads << Thread.new do
+            100.times do
+              expect(
+                subject.decrypt(ciphertext, key: key, aad: auth_data)
+              ).to eq(plaintext)
+            end
+          end
+        end
+      ensure
+        threads.each(&:join)
+      end
+    end
+
     it "decrypts with AES-256-GCM" do
       expect(subject.decrypt(ciphertext, key: key, aad: auth_data)).to eq(plaintext)
     end
@@ -56,7 +77,7 @@ describe Slosilo::Symmetric do
       end
     end
   end
-  
+
   describe '#random_iv' do
     it "generates a random iv" do
       expect_any_instance_of(OpenSSL::Cipher).to receive(:random_iv).and_return :iv
