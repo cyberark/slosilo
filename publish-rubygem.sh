@@ -1,4 +1,4 @@
-
+               
 #!/usr/bin/env bash
 set -e
 
@@ -23,9 +23,12 @@ docker run \
   --volume "$(pwd)":"$(pwd)" \
   --workdir "$(pwd)" \
   cyberark/ubuntu-ruby-builder:latest \
-  "${base}/publish-rubygem-container-entrpoint.sh" "${project}"
+  "${base}/build_and_run" "${project}"
+
+#  "${base}/publish-rubygem-container-entrpoint.sh" "${project}"
 
 
+#OLD
 #!/bin/bash -e
 #
 #docker pull registry.tld/conjurinc/publish-rubygem

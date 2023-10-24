@@ -31,13 +31,6 @@ pipeline {
           }
         }
 
-        stage('Bunny tests') {
-          steps {
-            sh './bunny-test.sh'
-          }
-        }
-
-
       }
     }
 
@@ -69,7 +62,15 @@ pipeline {
         deleteDir()
       }
     }
+
+    stage('Bunny tests') {
+      steps {
+        sh './bunny-test.sh'
+      }
+    }
+
   }
+
 
   post {
     always {
