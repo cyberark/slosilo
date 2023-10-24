@@ -30,6 +30,14 @@ pipeline {
             sh './test.sh'
           }
         }
+
+        stage('Bunny tests') {
+          steps {
+            sh './bunny-test.sh'
+          }
+        }
+
+
       }
     }
 
