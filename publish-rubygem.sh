@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+echo "Bunny Test"
+
 docker pull registry.tld/conjurinc/publish-rubygem
 
 git clean -fxd
