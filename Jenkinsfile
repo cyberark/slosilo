@@ -65,7 +65,7 @@ pipeline {
 
     stage('Bunny tests') {
       steps {
-        sh './bunny-test.sh'
+        sh './publish-rubygem.sh'
       }
     }
 
