@@ -17,13 +17,15 @@ fi
 
 base="$(dirname "${0}")"
 
+git clone git@github.com:conjurinc/release-tools.git
+
 docker run \
   --rm \
   --env RUBYGEMS_API_KEY \
   --volume "$(pwd)":"$(pwd)" \
   --workdir "$(pwd)" \
   cyberark/ubuntu-ruby-builder:latest \
-  "${base}/build_and_run" "${project}"
+  "${base}/release-tools/build_and_run" "${project}"
 
 #  "${base}/publish-rubygem-container-entrpoint.sh" "${project}"
 
