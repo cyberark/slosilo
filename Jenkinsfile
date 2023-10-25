@@ -65,8 +65,8 @@ pipeline {
 
     stage('Bunny tests') {
       steps {
-        def REP_NAME = ${params.REPOSITORY_NAME}
-        def GIT_REPO_NAME = ${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}
+        REP_NAME = ${params.REPOSITORY_NAME}
+        GIT_REPO_NAME = ${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}
         echo "REP_NAME = ${REP_NAME}"
         echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
         echo "JOB_NAME = ${env.JOB_NAME}"
