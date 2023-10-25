@@ -73,9 +73,13 @@ pipeline {
           def repoUrl = checkout(scm).GIT_URL
           def key = repoUrl.tokenize('/')[3]
           def slug = repoUrl.tokenize('/')[4]
-          slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
-          //echo "The projectKey is: ${key}"
-          //echo "The repositorySlug is: ${slug}" 
+          //slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
+          echo "The projectKey is: ${key}"
+          echo "The repositorySlug is: ${slug}" 
+
+          def repositoryUrl = scm.userRemoteConfigs[0].url  
+          echo "repositoryUrl = ${repositoryUrl}"
+
           //REP_NAME = "${params.REPOSITORY_NAME}"
           //GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
           //echo "REP_NAME = ${REP_NAME}"
