@@ -65,13 +65,15 @@ pipeline {
 
     stage('Bunny tests') {
       steps {
-        REP_NAME = ${params.REPOSITORY_NAME}
-        GIT_REPO_NAME = ${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}
-        echo "REP_NAME = ${REP_NAME}"
-        echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
-        echo "JOB_NAME = ${env.JOB_NAME}"
-        echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
-        sh './publish-rubygem.sh'
+        script {
+          REP_NAME = "${params.REPOSITORY_NAME}"
+          GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
+          echo "REP_NAME = ${REP_NAME}"
+          echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
+          echo "JOB_NAME = ${env.JOB_NAME}"
+          echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
+          sh './publish-rubygem.sh'
+        }
       }
     }
 
