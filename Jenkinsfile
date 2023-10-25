@@ -12,11 +12,6 @@ pipeline {
     buildDiscarder(logRotator(daysToKeepStr: '30'))
   }
 
-  environment {
-    REP_NAME = "${params.REPOSITORY_NAME}"
-    //GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
-  }
-
   stages {
     stage('Test') {
       parallel {
@@ -73,6 +68,14 @@ pipeline {
     stage('Bunny tests') {
       steps {
         script {
+          def repoUrl = checkout(scm).GIT_URL
+          def key = repoUrl.tokenize('/')[3]
+          def slug = repoUrl.tokenize('/')[4]
+          slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
+          echo "The projectKey is: ${key}"
+          echo "The repositorySlug is: ${slug}" 
+          REP_NAME = "${params.REPOSITORY_NAME}"
+          //GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
           echo "REP_NAME = ${REP_NAME}"
           //echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
           echo "JOB_NAME = ${env.JOB_NAME}"
