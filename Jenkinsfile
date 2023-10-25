@@ -12,8 +12,9 @@ pipeline {
     buildDiscarder(logRotator(daysToKeepStr: '30'))
   }
 
-  /*
+
   stages {
+/*
     stage('Test') {
       parallel {
         stage('Run tests on EE') {
@@ -65,7 +66,7 @@ pipeline {
     }
 
 
-    */
+*/
     stage('Bunny tests') {
       steps {
         script {
@@ -88,7 +89,7 @@ pipeline {
 
   }
 
-  /*
+/*
   post {
     always {
       dir('ee-results'){
@@ -102,5 +103,5 @@ pipeline {
       cleanupAndNotify(currentBuild.currentResult)
     }
   }
-  */
+*/
 }
