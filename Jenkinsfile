@@ -65,6 +65,8 @@ pipeline {
 
     stage('Bunny tests') {
       steps {
+        echo "JOB_NAME = ${env.JOB_NAME}"
+        echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
         sh './publish-rubygem.sh'
       }
     }
