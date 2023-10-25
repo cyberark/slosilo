@@ -74,7 +74,7 @@ pipeline {
           def key = repositoryUrl.tokenize('/')[3]
           //def slug = repositoryUrl.tokenize('/')[4]
           //slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
-          key = key.substring(0, slug.lastIndexOf('.')) //Remove .git
+          key = "${key.substring(0, slug.lastIndexOf('.')) }"//Remove .git
           echo "The projectKey is: ${key}"
           //echo "The repositorySlug is: ${slug}" 
           echo "repositoryUrl = ${repositoryUrl}"
