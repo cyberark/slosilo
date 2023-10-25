@@ -65,6 +65,8 @@ pipeline {
 
     stage('Bunny tests') {
       steps {
+        env.GIT_REPO_NAME = env.GIT_URL.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')
+        echo "JOB_NAME = ${env.GIT_REPO_NAME}"
         echo "JOB_NAME = ${env.JOB_NAME}"
         echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
         sh './publish-rubygem.sh'
