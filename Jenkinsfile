@@ -70,19 +70,13 @@ pipeline {
     stage('Bunny tests') {
       steps {
         script {
-          //def repoUrl = checkout(scm).GIT_URL
-          //def key = repoUrl.tokenize('/')[3]
-          //def slug = repoUrl.tokenize('/')[4]
-          //slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
-          //echo "The projectKey is: ${key}"
-          //echo "The repositorySlug is: ${slug}" 
-
           def repositoryUrl = scm.userRemoteConfigs[0].url  
           def key = repositoryUrl.tokenize('/')[3]
-          def slug = repositoryUrl.tokenize('/')[4]
+          //def slug = repositoryUrl.tokenize('/')[4]
           //slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
+          key = key.substring(0, slug.lastIndexOf('.')) //Remove .git
           echo "The projectKey is: ${key}"
-          echo "The repositorySlug is: ${slug}" 
+          //echo "The repositorySlug is: ${slug}" 
           echo "repositoryUrl = ${repositoryUrl}"
 
           //REP_NAME = "${params.REPOSITORY_NAME}"
