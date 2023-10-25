@@ -87,7 +87,7 @@ pipeline {
 
   }
 
-
+  /*
   post {
     always {
       dir('ee-results'){
@@ -101,4 +101,5 @@ pipeline {
       cleanupAndNotify(currentBuild.currentResult)
     }
   }
+  */
 }
