@@ -12,6 +12,11 @@ pipeline {
     buildDiscarder(logRotator(daysToKeepStr: '30'))
   }
 
+  environment {
+    REP_NAME = "${params.REPOSITORY_NAME}"
+    GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
+  }
+
   stages {
     stage('Test') {
       parallel {
@@ -63,10 +68,7 @@ pipeline {
       }
     }
 
-    environment {
-      REP_NAME = "${params.REPOSITORY_NAME}"
-      GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
-    }
+
 
     stage('Bunny tests') {
       steps {
