@@ -72,21 +72,13 @@ pipeline {
         script {
           def repositoryUrl = scm.userRemoteConfigs[0].url  
           def key = repositoryUrl.tokenize('/')[3]
-          //def slug = repositoryUrl.tokenize('/')[4]
-          //slug = slug.substring(0, slug.lastIndexOf('.')) //Remove .git
-          echo "key.substring = ${key.substring(0, key.lastIndexOf('.')) }"//Remove .git
+          //echo "key.substring = ${key.substring(0, key.lastIndexOf('.')) }"//Remove .git
           key = "${key.substring(0, key.lastIndexOf('.')) }"//Remove .git
           echo "The projectKey is: ${key}"
-          //echo "The repositorySlug is: ${slug}" 
           echo "repositoryUrl = ${repositoryUrl}"
-
-          //REP_NAME = "${params.REPOSITORY_NAME}"
-          //GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
-          //echo "REP_NAME = ${REP_NAME}"
-          //echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
           echo "JOB_NAME = ${env.JOB_NAME}"
           echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
-          //sh './publish-rubygem.sh'
+          sh "./publish-rubygem.sh ${key}"
         }
       }
     }
