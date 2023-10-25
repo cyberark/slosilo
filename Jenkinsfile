@@ -14,7 +14,7 @@ pipeline {
 
   environment {
     REP_NAME = "${params.REPOSITORY_NAME}"
-    GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
+    //GIT_REPO_NAME = "${GIT_REPO_NAME.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')}"
   }
 
   stages {
@@ -74,10 +74,10 @@ pipeline {
       steps {
         script {
           echo "REP_NAME = ${REP_NAME}"
-          echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
+          //echo "GIT_REPO_NAME = ${GIT_REPO_NAME}"
           echo "JOB_NAME = ${env.JOB_NAME}"
           echo "JOB_BASE_NAME = ${env.JOB_BASE_NAME}"
-          sh './publish-rubygem.sh'
+          //sh './publish-rubygem.sh'
         }
       }
     }
