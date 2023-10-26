@@ -25,8 +25,8 @@ echo "Doing the Docker Run"
 docker run \
   --rm \
   --env RUBYGEMS_API_KEY \
-  --volume "$(pwd)":"$(pwd)" \
-  --workdir "$(pwd)" \
+  --volume "$(base)":"$(base)" \
+  --workdir "$(base)" \
   cyberark/ubuntu-ruby-builder:latest \
   "${base}/release-tools/bin/build_and_run" "${project}"
 
