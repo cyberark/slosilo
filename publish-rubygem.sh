@@ -1,6 +1,6 @@
                
 #!/usr/bin/env bash
-set -e
+set -ex
 
 if [ $# -ne 1 ]; then
   echo "Usage: $0 <project>"
@@ -16,9 +16,12 @@ if [ ! -f "${project}.gemspec" ]; then
 fi
 
 base="$(dirname "${0}")"
+echo "Base Dir = ${base}"
 
+echo "Cloning Release-Tools GIT Repo"
 git clone git@github.com:conjurinc/release-tools.git
 
+echo "Doing the Docker Run"
 docker run \
   --rm \
   --env RUBYGEMS_API_KEY \
