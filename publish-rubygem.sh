@@ -28,7 +28,9 @@ docker run \
   --volume "$(pwd)":"$(pwd)" \
   --workdir "$(pwd)" \
   cyberark/ubuntu-ruby-builder:latest \
-  sh -c "./release-tools/bin/build_and_run ${project}"
+  sh -c "ls -la"
+
+#  sh -c "./release-tools/bin/build_and_run ${project}"
   
 #  "./release-tools/bin/build_and_run" "${project}"
 echo "==> Done with Docker Run"
