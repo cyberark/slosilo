@@ -28,7 +28,9 @@ docker run \
   --volume "$(pwd)":"$(pwd)" \
   --workdir "$(pwd)" \
   cyberark/ubuntu-ruby-builder:latest \
-  "release-tools/bin/build_and_run" "${project}"
+  sh -c "./release-tools/bin/build_and_run ${project}"
+  
+#  "./release-tools/bin/build_and_run" "${project}"
 echo "==> Done with Docker Run"
 
 #  "${base}/publish-rubygem-container-entrpoint.sh" "${project}"
