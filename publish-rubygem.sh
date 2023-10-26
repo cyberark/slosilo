@@ -16,19 +16,20 @@ if [ ! -f "${project}.gemspec" ]; then
 fi
 
 base="$(dirname "${0}")"
-echo "Base Dir = ${base}"
+echo "==> Base Dir = ${base}"
 
-echo "Cloning Release-Tools GIT Repo"
+echo "==> Cloning Release-Tools GIT Repo"
 git clone git@github.com:conjurinc/release-tools.git
 
-echo "Doing the Docker Run"
+echo "==> Doing the Docker Run"
 docker run \
   --rm \
   --env RUBYGEMS_API_KEY \
-  --volume "$(base)":"$(base)" \
-  --workdir "$(base)" \
+  --volume "$(pwd)":"$(pwd)" \
+  --workdir "$(pwd)" \
   cyberark/ubuntu-ruby-builder:latest \
-  "${base}/release-tools/bin/build_and_run" "${project}"
+  "${pwd}/release-tools/bin/build_and_run" "${project}"
+echo "==> Done with Docker Run"
 
 #  "${base}/publish-rubygem-container-entrpoint.sh" "${project}"
 
