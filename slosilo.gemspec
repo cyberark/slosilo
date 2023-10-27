@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["divided.mind@gmail.com"]
   gem.description   = %q{This gem provides an easy way of storing and retrieving encryption keys in the database.}
   gem.summary       = %q{Store SSL keys in a database}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/cyberark/slosilo"
   gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
