@@ -12,6 +12,8 @@ export PATH=$PATH:"$(pwd)/release-tools/bin"
 #echo "${PATH}"
 #ls -l "$(pwd)/release-tools/bin"
 
+echo "==> RUBYGEMS_API_KEY = ${RUBYGEMS_API_KEY }"
+
 #then call publish_rubygems script
-echo "==> Run Script: publish_rubygem "
+echo "==> Run Script: publish_rubygem slosilo"
 publish-rubygem slosilo
