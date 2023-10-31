@@ -1,6 +1,14 @@
 #!/bin/bash -e
 set -e
 
+# Scripted pipeline
+#def buildNumber = currentBuild.number
+
+# Declarative pipeline
+echo "==> Build number is ${currentBuild.number}"
+
+
+
 echo "==> Cloning Release-Tools GIT Repo"
 git clone git@github.com:conjurinc/release-tools.git
 
