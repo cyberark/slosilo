@@ -5,7 +5,10 @@ set -e
 #def buildNumber = currentBuild.number
 
 # Declarative pipeline
-echo "==> Build number is ${currentBuild.number}"
+#echo "==> Build number is ${currentBuild.number}"
+
+BUILDNO=%BUILD_NUMBER%
+echo "==> Build Number = ${BUILDNO}"
 
 
 
