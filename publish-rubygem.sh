@@ -1,15 +1,17 @@
 #!/bin/bash -e
 set -e
 
+#For Jenkinsfile
 # Scripted pipeline
 #def buildNumber = currentBuild.number
-
+#
 # Declarative pipeline
 #echo "==> Build number is ${currentBuild.number}"
 
 echo "==> Build Number = ${BUILD_NUMBER}"
 
-
+ls -l
+# Is there a VERSION file?
 
 echo "==> Cloning Release-Tools GIT Repo"
 git clone git@github.com:conjurinc/release-tools.git
