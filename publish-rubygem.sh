@@ -7,8 +7,7 @@ set -e
 # Declarative pipeline
 #echo "==> Build number is ${currentBuild.number}"
 
-BUILDNO=%BUILD_NUMBER%
-echo "==> Build Number = ${BUILDNO}"
+echo "==> Build Number = ${BUILD_NUMBER}"
 
 
 
